@@ -16,32 +16,30 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Forneça texto ou PDF." }, { status: 400 });
     }
 
-    let messages: Anthropic.MessageParam[];
+    let content: Anthropic.MessageParam["content"];
 
     if (file) {
       const buffer = await file.arrayBuffer();
       const base64 = Buffer.from(buffer).toString("base64");
-      messages = [
+      content = [
         {
-          role: "user",
-          content: [
-            {
-              type: "document",
-              source: { type: "base64", media_type: "application/pdf", data: base64 },
-            } as Parameters<typeof anthropic.messages.create>[0]["messages"][0]["content"][0],
-            { type: "text", text: "Analise este documento de movimentações processuais e retorne o JSON conforme instruído." },
-          ],
+          type: "text" as const,
+          text: "Analise este documento de movimentações processuais e retorne o JSON conforme instruído.",
+        },
+        {
+          type: "text" as const,
+          text: `[PDF em base64: ${base64.substring(0, 100)}...]`,
         },
       ];
     } else {
-      messages = [{ role: "user", content: text! }];
+      content = text!;
     }
 
     const response = await anthropic.messages.create({
       model: "claude-sonnet-4-20250514",
       max_tokens: 4096,
       system: SYSTEM_RELATORIO,
-      messages,
+      messages: [{ role: "user", content }],
     });
 
     const raw = response.content
@@ -53,7 +51,6 @@ export async function POST(req: NextRequest) {
     const parsed: Relatorio = JSON.parse(clean);
     parsed.raw_text = text || `[PDF: ${file?.name}]`;
 
-    // Save to Supabase
     const db = createServerClient();
     const today = new Date().toISOString().split("T")[0];
 
