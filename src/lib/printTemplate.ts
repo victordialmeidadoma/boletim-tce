@@ -135,8 +135,9 @@ export function generateBoletimHTML(opts: PrintOptions): string {
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Boletim Informativo — ${municipio.nome} — ${data}</title>
 <style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap');
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: Georgia, 'Times New Roman', serif; font-size: 12px; color: #111827; background: #fff; }
+  body { font-family: 'Inter', system-ui, sans-serif; font-size: 12px; color: #111827; background: #fff; }
   @page { size: A4; margin: 18mm 16mm 16mm; }
   @media print {
     body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
