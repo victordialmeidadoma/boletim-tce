@@ -28,7 +28,7 @@ export async function POST(req: NextRequest) {
             {
               type: "document",
               source: { type: "base64", media_type: "application/pdf", data: base64 },
-            } as Anthropic.DocumentBlockParam,
+            } as Parameters<typeof anthropic.messages.create>[0]["messages"][0]["content"][0],
             { type: "text", text: "Analise este documento de movimentações processuais e retorne o JSON conforme instruído." },
           ],
         },
