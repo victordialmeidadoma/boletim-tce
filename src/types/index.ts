@@ -75,3 +75,35 @@ export interface Boletim {
   diario_texto?: string;
   created_at?: string;
 }
+
+export interface Municipio {
+  id?: string;
+  nome: string;
+  estado: string;
+  brasao_url?: string;
+  assessoria_id?: string;
+  created_at?: string;
+}
+
+export interface Gestor {
+  id?: string;
+  nome: string;
+  cargo: string;
+  cpf?: string;
+  email?: string;
+  municipio_id?: string;
+  municipio_nome?: string;
+  created_at?: string;
+}
+
+export interface Assessoria {
+  id?: string;
+  nome: string;
+  cnpj?: string;
+  endereco?: string;
+  email?: string;
+  telefone?: string;
+  logo_url?: string;
+  municipios?: string[];
+  created_at?: string;
+}

@@ -109,7 +109,7 @@ export default function BoletimPage() {
       prazo:       form.prazo       || undefined,
       parecer_mp:  form.parecer_mp  || undefined,
       decisao:     form.decisao     || undefined,
-      descricao:   form.descricao   || "",
+      descricao:   form.descricao   || undefined,
     };
     const key = form.municipio.toUpperCase();
     setMunicipiosMencoes((prev) => ({
@@ -485,16 +485,36 @@ export default function BoletimPage() {
 
             <div className="p-5">
               {Object.entries(municipiosMencoes).map(([muni, v]) => (
-                <MunicipioSection
-                  key={muni}
-                  municipio={{
-                    nome: muni,
-                    processos_dia:      processosDia.filter((p) => p.municipio === muni),
-                    mencoes_diario:     v.mencoes,
-                    resumo_consolidado: v.resumo,
-                  }}
-                  onRemoveMencao={(idx) => removeMencao(muni, idx)}
-                />
+                <div key={muni}>
+                  <MunicipioSection
+                    municipio={{
+                      nome: muni,
+                      processos_dia:      processosDia.filter((p) => p.municipio === muni),
+                      mencoes_diario:     v.mencoes,
+                      resumo_consolidado: v.resumo,
+                    }}
+                    onRemoveMencao={(idx) => removeMencao(muni, idx)}
+                  />
+                  <div className="flex justify-end mb-4 -mt-2">
+                    <button
+                      onClick={async () => {
+                        await saveBoletim();
+                        const res = await fetch("/api/gerar-pdf", {
+                          method: "POST",
+                          headers: { "Content-Type": "application/json" },
+                          body: JSON.stringify({ data: today, municipio_nome: muni, aviso: bulkAviso }),
+                        });
+                        const html = await res.text();
+                        const blob = new Blob([html], { type: "text/html" });
+                        window.open(URL.createObjectURL(blob), "_blank");
+                      }}
+                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-ink-200 text-xs text-ink-600 hover:bg-ink-50 transition-colors"
+                    >
+                      <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+                      Gerar PDF
+                    </button>
+                  </div>
+                </div>
               ))}
 
               {/* sem processo */}
