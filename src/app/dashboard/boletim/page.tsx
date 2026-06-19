@@ -107,9 +107,9 @@ export default function BoletimPage() {
         : undefined,
       relator:     form.relator     || undefined,
       prazo:       form.prazo       || undefined,
-      parecer_mp:  form.parecer_mp  || "",
-      decisao:     form.decisao     || "",
-      descricao:   form.descricao   || "",
+      parecer_mp:  form.parecer_mp  || undefined,
+      decisao:     form.decisao     || undefined,
+      descricao:   form.descricao   || undefined,
     };
     const key = form.municipio.toUpperCase();
     setMunicipiosMencoes((prev) => ({

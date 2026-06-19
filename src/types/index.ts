@@ -107,3 +107,23 @@ export interface Assessoria {
   municipios?: string[];
   created_at?: string;
 }
+
+export interface PublicacaoDiario {
+  id?: string;
+  data: string;
+  tipo: TipoDiario;
+  proc: string;
+  natureza?: string;
+  especie?: string;
+  exercicio?: string;
+  entidade?: string;
+  municipio?: string;
+  responsaveis?: string[];
+  relator?: string;
+  prazo?: string;
+  parecer_mp?: string;
+  decisao?: string;
+  descricao?: string;
+  texto_original?: string;
+  created_at?: string;
+}

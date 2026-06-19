@@ -1,15 +1,20 @@
 "use client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Scale, FileText, Newspaper, History, Building2, Users } from "lucide-react";
+import { Scale, FileText, Newspaper, History, Building2, Users, BookOpen, Briefcase } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-const nav = [
-  { href: "/dashboard",              label: "Movimentação processual", icon: FileText  },
-  { href: "/dashboard/boletim",      label: "Boletim informativo",     icon: Newspaper },
-  { href: "/historico",              label: "Histórico",               icon: History   },
-  { href: "/cadastro/municipios",    label: "Municípios",              icon: Building2 },
-  { href: "/cadastro/gestores",      label: "Gestores",                icon: Users     },
+const navDiario = [
+  { href: "/dashboard",         label: "Movimentação processual", icon: FileText  },
+  { href: "/dashboard/diario",  label: "Diário do TCE-MA",        icon: BookOpen  },
+  { href: "/dashboard/boletim", label: "Boletim informativo",     icon: Newspaper },
+  { href: "/historico",         label: "Histórico",               icon: History   },
+];
+
+const navCadastro = [
+  { href: "/cadastro/assessorias", label: "Assessorias", icon: Briefcase },
+  { href: "/cadastro/municipios",  label: "Municípios",  icon: Building2 },
+  { href: "/cadastro/gestores",    label: "Gestores",    icon: Users     },
 ];
 
 export function Sidebar() {
@@ -28,11 +33,11 @@ export function Sidebar() {
 
       <nav className="flex-1 px-3 py-4 space-y-0.5">
         <p className="text-xs text-ink-300 px-3 pb-1 pt-1">Diário</p>
-        {nav.slice(0, 3).map(({ href, label, icon: Icon }) => (
+        {navDiario.map(({ href, label, icon: Icon }) => (
           <NavItem key={href} href={href} label={label} icon={Icon} active={pathname === href} />
         ))}
         <p className="text-xs text-ink-300 px-3 pb-1 pt-3">Cadastros</p>
-        {nav.slice(3).map(({ href, label, icon: Icon }) => (
+        {navCadastro.map(({ href, label, icon: Icon }) => (
           <NavItem key={href} href={href} label={label} icon={Icon} active={pathname === href} />
         ))}
       </nav>
@@ -44,7 +49,9 @@ export function Sidebar() {
   );
 }
 
-function NavItem({ href, label, icon: Icon, active }: { href: string; label: string; icon: React.ElementType; active: boolean }) {
+function NavItem({ href, label, icon: Icon, active }: {
+  href: string; label: string; icon: React.ElementType; active: boolean;
+}) {
   return (
     <Link href={href} className={cn(
       "flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm transition-colors",
