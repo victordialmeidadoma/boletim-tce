@@ -98,18 +98,18 @@ export default function BoletimPage() {
     if (!form.municipio || !form.tipo) return;
     const mencao: MencaoDiario = {
       tipo: form.tipo as TipoDiario, proc: form.proc,
-      entidade:    form.entidade    || undefined,
-      natureza:    form.natureza    || undefined,
-      especie:     form.especie     || undefined,
-      exercicio:   form.exercicio   || undefined,
+      entidade:    form.entidade    || "",
+      natureza:    form.natureza    || "",
+      especie:     form.especie     || "",
+      exercicio:   form.exercicio   || "",
       responsaveis: form.responsaveis
         ? form.responsaveis.split(";").map((s) => s.trim()).filter(Boolean)
         : undefined,
-      relator:     form.relator     || undefined,
-      prazo:       form.prazo       || undefined,
-      parecer_mp:  form.parecer_mp  || undefined,
-      decisao:     form.decisao     || undefined,
-      descricao:   form.descricao   || undefined,
+      relator:     form.relator     || "",
+      prazo:       form.prazo       || "",
+      parecer_mp:  form.parecer_mp  || "",
+      decisao:     form.decisao     || "",
+      descricao:   form.descricao   || "",
     };
     const key = form.municipio.toUpperCase();
     setMunicipiosMencoes((prev) => ({
