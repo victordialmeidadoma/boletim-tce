@@ -152,27 +152,21 @@ export function generateBoletimHTML(opts: PrintOptions): string {
 <div class="page">
 
   <!-- CABEÇALHO -->
-  <div style="border-bottom:2px solid #111827;padding-bottom:16px;margin-bottom:0">
-    <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px">
-      <div style="display:flex;align-items:center;gap:14px">
+  <div style="border-bottom:2px solid #111827;padding-bottom:18px;margin-bottom:0">
+    <div style="display:flex;flex-direction:column;align-items:center;gap:10px">
+      <div style="display:flex;align-items:center;justify-content:center;gap:20px">
         ${assessoria.logo_url
-          ? `<img src="${assessoria.logo_url}" style="width:52px;height:52px;object-fit:contain;border-radius:8px" alt="Logo">`
-          : `<div style="width:52px;height:52px;border-radius:8px;background:#EEF2FF;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;color:#3730A3;border:0.5px solid #C7D2FE;font-family:'Inter',system-ui,sans-serif">${initials}</div>`
+          ? `<img src="${assessoria.logo_url}" style="width:76px;height:76px;object-fit:contain;border-radius:10px" alt="Logo">`
+          : `<div style="width:76px;height:76px;border-radius:10px;background:#EEF2FF;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700;color:#3730A3;border:0.5px solid #C7D2FE;font-family:'Inter',system-ui,sans-serif">${initials}</div>`
         }
-        <div style="width:0.5px;height:52px;background:#E2E8F0;flex-shrink:0"></div>
         ${brasaoUrl
-          ? `<img src="${brasaoUrl}" style="width:52px;height:52px;object-fit:contain;border-radius:50%" alt="Brasão">`
-          : `<div style="width:52px;height:52px;border-radius:50%;background:#F1F5F9;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:#64748B;border:0.5px solid #E2E8F0;font-family:'Inter',system-ui,sans-serif">${muniLabel.substring(0,2).toUpperCase()}</div>`
+          ? `<img src="${brasaoUrl}" style="width:76px;height:76px;object-fit:contain;border-radius:50%" alt="Brasão">`
+          : `<div style="width:76px;height:76px;border-radius:50%;background:#F1F5F9;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:600;color:#64748B;border:0.5px solid #E2E8F0;font-family:'Inter',system-ui,sans-serif">${muniLabel.substring(0,2).toUpperCase()}</div>`
         }
-        <div>
-          <p style="font-size:15px;font-weight:700;color:#111827;font-family:'Inter',system-ui,sans-serif;letter-spacing:-.01em">${assessoria.nome}</p>
-          ${assessoria.cnpj ? `<p style="font-size:10px;color:#64748B;margin-top:2px;font-family:'Inter',system-ui,sans-serif">CNPJ ${assessoria.cnpj}</p>` : ""}
-          ${assessoria.endereco ? `<p style="font-size:10px;color:#64748B;font-family:'Inter',system-ui,sans-serif">${assessoria.endereco}</p>` : ""}
-        </div>
       </div>
-      <div style="text-align:right;flex-shrink:0">
+      <div style="text-align:center">
         <p style="font-size:10px;font-weight:700;color:#4338CA;text-transform:uppercase;letter-spacing:.08em;font-family:'Inter',system-ui,sans-serif">Boletim informativo</p>
-        <p style="font-size:11px;color:#64748B;margin-top:4px;font-family:'Inter',system-ui,sans-serif">${dataCapitalizada}</p>
+        <p style="font-size:11px;color:#64748B;margin-top:3px;font-family:'Inter',system-ui,sans-serif">${dataCapitalizada}</p>
       </div>
     </div>
   </div>
@@ -218,9 +212,154 @@ export function generateBoletimHTML(opts: PrintOptions): string {
   </div>
 
   <!-- RODAPÉ -->
-  <div style="border-top:0.5px solid #E2E8F0;padding-top:8px;display:flex;justify-content:space-between;align-items:center">
-    <span style="font-size:9px;color:#94A3B8;font-family:'Inter',system-ui,sans-serif">${assessoria.nome} · Gerado em ${new Date().toLocaleDateString("pt-BR")}</span>
-    <span style="font-size:9px;color:#94A3B8;font-family:'Inter',system-ui,sans-serif">TCE-MA · Boletim informativo</span>
+  <div style="border-top:0.5px solid #E2E8F0;padding-top:10px;display:flex;justify-content:space-between;align-items:flex-start">
+    <div style="text-align:left">
+      <p style="font-size:10px;font-weight:600;color:#374151;font-family:'Inter',system-ui,sans-serif">${assessoria.nome}</p>
+      ${assessoria.cnpj ? `<p style="font-size:9px;color:#94A3B8;margin-top:1px;font-family:'Inter',system-ui,sans-serif">CNPJ ${assessoria.cnpj}</p>` : ""}
+      ${assessoria.endereco ? `<p style="font-size:9px;color:#94A3B8;font-family:'Inter',system-ui,sans-serif">${assessoria.endereco}</p>` : ""}
+      ${assessoria.email ? `<p style="font-size:9px;color:#94A3B8;font-family:'Inter',system-ui,sans-serif">${assessoria.email}</p>` : ""}
+    </div>
+    <div style="text-align:right">
+      <p style="font-size:9px;color:#94A3B8;font-family:'Inter',system-ui,sans-serif">Gerado em ${new Date().toLocaleDateString("pt-BR")}</p>
+      <p style="font-size:9px;color:#94A3B8;margin-top:1px;font-family:'Inter',system-ui,sans-serif">TCE-MA · Boletim informativo</p>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>`;
+}
+
+
+// ───────────────────────────────────────────────────────────
+// Documento ÚNICO com TODOS os municípios (uso interno/equipe)
+// ───────────────────────────────────────────────────────────
+
+interface PrintCompletoOptions {
+  assessoria: Assessoria;
+  municipios: MunicipioCruzado[];
+  data: string;
+  aviso?: string;
+}
+
+function renderMuniBlocoCompleto(municipio: MunicipioCruzado): string {
+  const muniLabel = municipio.nome.charAt(0) + municipio.nome.slice(1).toLowerCase();
+  const hasProcs   = municipio.processos_dia.length > 0;
+  const hasMencoes = municipio.mencoes_diario.length > 0;
+
+  return `
+  <div style="margin-bottom:28px;padding-bottom:20px;border-bottom:1px solid #E2E8F0">
+    <div style="background:#111827;color:#fff;padding:10px 16px;border-radius:6px;margin-bottom:14px">
+      <p style="font-size:14px;font-weight:700;font-family:'Inter',system-ui,sans-serif;letter-spacing:-.01em">${muniLabel}</p>
+    </div>
+
+    ${hasProcs ? `
+    <p style="font-size:9px;font-weight:700;color:#94A3B8;text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px;padding-bottom:6px;border-bottom:0.5px solid #F1F5F9;font-family:'Inter',system-ui,sans-serif">Movimentação processual no TCE-MA</p>
+    ${municipio.processos_dia.map(renderProcesso).join("")}` : ""}
+
+    ${hasMencoes ? `
+    <p style="font-size:9px;font-weight:700;color:#94A3B8;text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px;padding-bottom:6px;border-bottom:0.5px solid #F1F5F9;${hasProcs ? "margin-top:18px;" : ""}font-family:'Inter',system-ui,sans-serif">Menções no Diário do TCE-MA</p>
+    ${municipio.mencoes_diario.map(renderMencao).join("")}` : ""}
+
+    ${municipio.resumo_consolidado ? `
+    <div style="margin-top:14px;background:#EEF2FF;border-radius:6px;padding:10px 13px">
+      <p style="font-size:9px;font-weight:700;color:#3730A3;text-transform:uppercase;letter-spacing:.07em;margin-bottom:4px;font-family:'Inter',system-ui,sans-serif">Resumo</p>
+      <p style="font-size:11px;color:#3730A3;line-height:1.6;font-family:'Inter',system-ui,sans-serif">${municipio.resumo_consolidado}</p>
+    </div>` : ""}
+  </div>`;
+}
+
+export function generateCompletoHTML(opts: PrintCompletoOptions): string {
+  const { assessoria, municipios, data, aviso } = opts;
+  const dataFormatada = formatDate(data, "EEEE, dd 'de' MMMM 'de' yyyy");
+  const dataCapitalizada = dataFormatada.charAt(0).toUpperCase() + dataFormatada.slice(1);
+  const initials = assessoria.nome.split(" ").slice(0, 2).map((w: string) => w[0]).join("").toUpperCase();
+
+  const totalProcessos = municipios.reduce((acc, m) => acc + m.processos_dia.length, 0);
+  const totalMencoes   = municipios.reduce((acc, m) => acc + m.mencoes_diario.length, 0);
+
+  return `<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Boletim Informativo Completo — ${data}</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Inter', system-ui, sans-serif; font-size: 12px; color: #111827; background: #fff; }
+  @page { size: A4; margin: 16mm 16mm 14mm; }
+  @media print {
+    body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .no-print { display: none !important; }
+  }
+  .page { max-width: 720px; margin: 0 auto; }
+  .print-btn { position: fixed; bottom: 24px; right: 24px; background: #111827; color: #fff; border: none; border-radius: 8px; padding: 10px 20px; font-size: 13px; font-weight: 500; cursor: pointer; font-family: 'Inter', system-ui, sans-serif; display: flex; align-items: center; gap: 8px; box-shadow: 0 4px 12px rgba(0,0,0,.15); }
+  .print-btn:hover { background: #374151; }
+</style>
+</head>
+<body>
+<button class="print-btn no-print" onclick="window.print()">
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+  Imprimir / Salvar PDF
+</button>
+
+<div class="page">
+
+  <!-- CABEÇALHO -->
+  <div style="border-bottom:2px solid #111827;padding-bottom:18px;margin-bottom:0">
+    <div style="display:flex;flex-direction:column;align-items:center;gap:10px">
+      ${assessoria.logo_url
+        ? `<img src="${assessoria.logo_url}" style="width:76px;height:76px;object-fit:contain;border-radius:10px" alt="Logo">`
+        : `<div style="width:76px;height:76px;border-radius:10px;background:#EEF2FF;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700;color:#3730A3;border:0.5px solid #C7D2FE;font-family:'Inter',system-ui,sans-serif">${initials}</div>`
+      }
+      <div style="text-align:center">
+        <p style="font-size:10px;font-weight:700;color:#4338CA;text-transform:uppercase;letter-spacing:.08em;font-family:'Inter',system-ui,sans-serif">Boletim informativo completo</p>
+        <p style="font-size:11px;color:#64748B;margin-top:3px;font-family:'Inter',system-ui,sans-serif">${dataCapitalizada}</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- RESUMO GERAL -->
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin:18px 0">
+    <div style="background:#F8FAFC;border-radius:6px;padding:10px 12px;text-align:center">
+      <p style="font-size:20px;font-weight:700;color:#111827;font-family:'Inter',system-ui,sans-serif">${municipios.length}</p>
+      <p style="font-size:9px;color:#94A3B8;text-transform:uppercase;letter-spacing:.05em;font-family:'Inter',system-ui,sans-serif">Municípios</p>
+    </div>
+    <div style="background:#F8FAFC;border-radius:6px;padding:10px 12px;text-align:center">
+      <p style="font-size:20px;font-weight:700;color:#111827;font-family:'Inter',system-ui,sans-serif">${totalProcessos}</p>
+      <p style="font-size:9px;color:#94A3B8;text-transform:uppercase;letter-spacing:.05em;font-family:'Inter',system-ui,sans-serif">Processos</p>
+    </div>
+    <div style="background:#F8FAFC;border-radius:6px;padding:10px 12px;text-align:center">
+      <p style="font-size:20px;font-weight:700;color:#111827;font-family:'Inter',system-ui,sans-serif">${totalMencoes}</p>
+      <p style="font-size:9px;color:#94A3B8;text-transform:uppercase;letter-spacing:.05em;font-family:'Inter',system-ui,sans-serif">Menções no diário</p>
+    </div>
+  </div>
+
+  ${aviso ? `
+  <div style="background:#FFFBEB;border:0.5px solid #FCD34D;border-radius:6px;padding:11px 14px;margin-bottom:18px">
+    <p style="font-size:9px;font-weight:700;color:#92400E;text-transform:uppercase;letter-spacing:.07em;margin-bottom:4px;font-family:'Inter',system-ui,sans-serif">Instrução / aviso</p>
+    <p style="font-size:12px;color:#78350F;line-height:1.65;font-family:'Inter',system-ui,sans-serif">${aviso}</p>
+  </div>` : ""}
+
+  <!-- CORPO: TODOS OS MUNICÍPIOS EM SEQUÊNCIA -->
+  <div style="padding-top:6px">
+    ${municipios.map(renderMuniBlocoCompleto).join("")}
+  </div>
+
+  <!-- RODAPÉ -->
+  <div style="border-top:0.5px solid #E2E8F0;padding-top:10px;display:flex;justify-content:space-between;align-items:flex-start">
+    <div style="text-align:left">
+      <p style="font-size:10px;font-weight:600;color:#374151;font-family:'Inter',system-ui,sans-serif">${assessoria.nome}</p>
+      ${assessoria.cnpj ? `<p style="font-size:9px;color:#94A3B8;margin-top:1px;font-family:'Inter',system-ui,sans-serif">CNPJ ${assessoria.cnpj}</p>` : ""}
+      ${assessoria.endereco ? `<p style="font-size:9px;color:#94A3B8;font-family:'Inter',system-ui,sans-serif">${assessoria.endereco}</p>` : ""}
+      ${assessoria.email ? `<p style="font-size:9px;color:#94A3B8;font-family:'Inter',system-ui,sans-serif">${assessoria.email}</p>` : ""}
+    </div>
+    <div style="text-align:right">
+      <p style="font-size:9px;color:#94A3B8;font-family:'Inter',system-ui,sans-serif">Gerado em ${new Date().toLocaleDateString("pt-BR")}</p>
+      <p style="font-size:9px;color:#94A3B8;margin-top:1px;font-family:'Inter',system-ui,sans-serif">TCE-MA · Documento interno — uso da equipe</p>
+    </div>
   </div>
 
 </div>

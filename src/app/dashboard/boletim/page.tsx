@@ -107,9 +107,9 @@ export default function BoletimPage() {
         : undefined,
       relator:     form.relator     || undefined,
       prazo:       form.prazo       || undefined,
-      parecer_mp:  form.parecer_mp  || "",
-      decisao:     form.decisao     || "",
-      descricao:   form.descricao   || "",
+      parecer_mp:  form.parecer_mp  || undefined,
+      decisao:     form.decisao     || undefined,
+      descricao:   form.descricao   || undefined,
     };
     const key = form.municipio.toUpperCase();
     setMunicipiosMencoes((prev) => ({
@@ -637,6 +637,30 @@ export default function BoletimPage() {
                   via <strong>Ctrl+P → Salvar como PDF</strong>
                 </p>
               )}
+
+              <div className="mt-3 pt-3 border-t border-ink-100">
+                <button
+                  onClick={async () => {
+                    await saveBoletim();
+                    const res = await fetch("/api/gerar-completo", {
+                      method: "POST",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({ data: today, aviso: bulkAviso }),
+                    });
+                    const html = await res.text();
+                    const blob = new Blob([html], { type: "text/html" });
+                    window.open(URL.createObjectURL(blob), "_blank");
+                  }}
+                  disabled={Object.keys(municipiosMencoes).length === 0}
+                  className="w-full py-3 rounded-xl text-sm font-medium border border-ink-200 text-ink-700 hover:bg-ink-50 disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2 transition-colors"
+                >
+                  <FileText className="w-4 h-4" />
+                  Gerar completo (todos os municípios em um único PDF — uso interno)
+                </button>
+                <p className="text-center text-xs text-ink-400 mt-2">
+                  Ideal para enviar à sua equipe — sem separar por gestor.
+                </p>
+              </div>
             </div>
           </div>
 
