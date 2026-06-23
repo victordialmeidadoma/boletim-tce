@@ -4,15 +4,17 @@ import { Building2, User, Calendar, Clock, Gavel, FileWarning, Bell, ClipboardLi
 import { cn } from "@/lib/utils";
 
 const TIPO_CONFIG: Record<TipoDiario, { label: string; icon: React.ElementType; className: string }> = {
-  PLENO_ACORDAO:          { label: "Pleno — Acórdão",            icon: Gavel,         className: "bg-purple-50 text-purple-800 border-purple-200" },
-  PLENO_DECISAO:          { label: "Pleno — Decisão",            icon: Gavel,         className: "bg-purple-50 text-purple-800 border-purple-200" },
-  PLENO_PARECER_PREVIO:   { label: "Pleno — Parecer prévio",     icon: Gavel,         className: "bg-purple-50 text-purple-800 border-purple-200" },
-  DESPACHO:               { label: "Despacho",                   icon: FileText,      className: "bg-sky-50 text-sky-800 border-sky-200" },
-  CITACAO:                { label: "Citação",                    icon: FileWarning,   className: "bg-red-50 text-red-800 border-red-200" },
-  FISCALIZACAO_AVISO:     { label: "Fiscalização — Aviso",       icon: Bell,          className: "bg-amber-50 text-amber-800 border-amber-200" },
-  FISCALIZACAO_RESULTADO: { label: "Fiscalização — Resultado",   icon: FileSearch,    className: "bg-amber-50 text-amber-800 border-amber-200" },
-  PAUTA:                  { label: "Pauta",                      icon: ClipboardList, className: "bg-slate-50 text-slate-700 border-slate-200" },
-  OUTROS:                 { label: "Outros",                     icon: FileText,      className: "bg-slate-50 text-slate-600 border-slate-200" },
+  PLENO_ACORDAO:               { label: "Pleno — Acórdão",            icon: Gavel,         className: "bg-purple-50 text-purple-800 border-purple-200" },
+  PLENO_DECISAO:               { label: "Pleno — Decisão",            icon: Gavel,         className: "bg-purple-50 text-purple-800 border-purple-200" },
+  PLENO_PARECER_PREVIO:        { label: "Pleno — Parecer prévio",     icon: Gavel,         className: "bg-purple-50 text-purple-800 border-purple-200" },
+  DESPACHO:                    { label: "Despacho",                   icon: FileText,      className: "bg-sky-50 text-sky-800 border-sky-200" },
+  CITACAO:                     { label: "Citação",                    icon: FileWarning,   className: "bg-red-50 text-red-800 border-red-200" },
+  FISCALIZACAO_AVISO:          { label: "Fiscalização — Aviso",       icon: Bell,          className: "bg-amber-50 text-amber-800 border-amber-200" },
+  FISCALIZACAO_RESULTADO:      { label: "Fiscalização — Resultado",   icon: FileSearch,    className: "bg-amber-50 text-amber-800 border-amber-200" },
+  FISCALIZACAO_ACOMPANHAMENTO: { label: "Fiscalização — Acompanhamento", icon: FileSearch, className: "bg-amber-50 text-amber-800 border-amber-200" },
+  FISCALIZACAO:                { label: "Fiscalização",               icon: FileSearch,    className: "bg-amber-50 text-amber-800 border-amber-200" },
+  PAUTA:                       { label: "Pauta",                      icon: ClipboardList, className: "bg-slate-50 text-slate-700 border-slate-200" },
+  OUTROS:                      { label: "Outros",                     icon: FileText,      className: "bg-slate-50 text-slate-600 border-slate-200" },
 };
 
 function MencaoCard({ m, onRemove }: { m: MencaoDiario; onRemove?: () => void }) {

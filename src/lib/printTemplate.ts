@@ -22,27 +22,31 @@ interface PrintOptions {
 }
 
 const TIPO_LABELS: Record<TipoDiario, string> = {
-  PLENO_ACORDAO:          "Pleno — Acórdão",
-  PLENO_DECISAO:          "Pleno — Decisão",
-  PLENO_PARECER_PREVIO:   "Pleno — Parecer prévio",
-  DESPACHO:               "Despacho",
-  CITACAO:                "Citação",
-  FISCALIZACAO_AVISO:     "Fiscalização — Aviso",
-  FISCALIZACAO_RESULTADO: "Fiscalização — Resultado",
-  PAUTA:                  "Pauta",
-  OUTROS:                 "Outros",
+  PLENO_ACORDAO:               "Pleno — Acórdão",
+  PLENO_DECISAO:               "Pleno — Decisão",
+  PLENO_PARECER_PREVIO:        "Pleno — Parecer prévio",
+  DESPACHO:                    "Despacho",
+  CITACAO:                     "Citação",
+  FISCALIZACAO_AVISO:          "Fiscalização — Aviso",
+  FISCALIZACAO_RESULTADO:      "Fiscalização — Resultado",
+  FISCALIZACAO_ACOMPANHAMENTO: "Fiscalização — Acompanhamento",
+  FISCALIZACAO:                "Fiscalização",
+  PAUTA:                       "Pauta",
+  OUTROS:                      "Outros",
 };
 
 const TIPO_STYLE: Record<TipoDiario, { bg: string; color: string; border: string }> = {
-  PLENO_ACORDAO:          { bg: "#F5F3FF", color: "#4C1D95", border: "#DDD6FE" },
-  PLENO_DECISAO:          { bg: "#F5F3FF", color: "#4C1D95", border: "#DDD6FE" },
-  PLENO_PARECER_PREVIO:   { bg: "#F5F3FF", color: "#4C1D95", border: "#DDD6FE" },
-  DESPACHO:               { bg: "#F0F9FF", color: "#0C4A6E", border: "#BAE6FD" },
-  CITACAO:                { bg: "#FFF1F2", color: "#881337", border: "#FECDD3" },
-  FISCALIZACAO_AVISO:     { bg: "#FFFBEB", color: "#78350F", border: "#FDE68A" },
-  FISCALIZACAO_RESULTADO: { bg: "#FFFBEB", color: "#78350F", border: "#FDE68A" },
-  PAUTA:                  { bg: "#F8FAFC", color: "#334155", border: "#CBD5E1" },
-  OUTROS:                 { bg: "#F9FAFB", color: "#374151", border: "#E5E7EB" },
+  PLENO_ACORDAO:               { bg: "#F5F3FF", color: "#4C1D95", border: "#DDD6FE" },
+  PLENO_DECISAO:               { bg: "#F5F3FF", color: "#4C1D95", border: "#DDD6FE" },
+  PLENO_PARECER_PREVIO:        { bg: "#F5F3FF", color: "#4C1D95", border: "#DDD6FE" },
+  DESPACHO:                    { bg: "#F0F9FF", color: "#0C4A6E", border: "#BAE6FD" },
+  CITACAO:                     { bg: "#FFF1F2", color: "#881337", border: "#FECDD3" },
+  FISCALIZACAO_AVISO:          { bg: "#FFFBEB", color: "#78350F", border: "#FDE68A" },
+  FISCALIZACAO_RESULTADO:      { bg: "#FFFBEB", color: "#78350F", border: "#FDE68A" },
+  FISCALIZACAO_ACOMPANHAMENTO: { bg: "#FFFBEB", color: "#78350F", border: "#FDE68A" },
+  FISCALIZACAO:                { bg: "#FFFBEB", color: "#78350F", border: "#FDE68A" },
+  PAUTA:                       { bg: "#F8FAFC", color: "#334155", border: "#CBD5E1" },
+  OUTROS:                      { bg: "#F9FAFB", color: "#374151", border: "#E5E7EB" },
 };
 
 function field(label: string, value: string | undefined, warn = false): string {

@@ -47,6 +47,8 @@ TIPOS DE PUBLICAÇÃO — identifique cada menção pelo seu cabeçalho:
 - "CITACAO": seção "CITAÇÃO"
 - "FISCALIZACAO_AVISO": seção "SECRETARIA DE FISCALIZAÇÃO - AVISO"
 - "FISCALIZACAO_RESULTADO": seção "SECRETARIA DE FISCALIZAÇÃO - RESULTADO"
+- "FISCALIZACAO_ACOMPANHAMENTO": seção "SECRETARIA DE FISCALIZAÇÃO - ACOMPANHAMENTO"
+- "FISCALIZACAO": seção "SECRETARIA DE FISCALIZAÇÃO" (sem subtítulo específico)
 - "PAUTA": seção "PAUTA"
 - "OUTROS": qualquer outro tipo
 
@@ -55,7 +57,7 @@ Para cada menção extraia os campos disponíveis conforme o tipo:
 - CITACAO: proc, natureza, exercicio, entidade, responsaveis, relator, prazo, descricao (resumo do que é citado para fazer)
 - PLENO_ACORDAO / PLENO_DECISAO / PLENO_PARECER_PREVIO: proc, natureza, especie, exercicio, entidade, responsaveis, relator, decisao (resumo do dispositivo)
 - DESPACHO: proc, entidade, responsaveis, descricao
-- FISCALIZACAO_AVISO / FISCALIZACAO_RESULTADO: proc, entidade, descricao
+- FISCALIZACAO_AVISO / FISCALIZACAO_RESULTADO / FISCALIZACAO_ACOMPANHAMENTO / FISCALIZACAO: proc, entidade, descricao
 - OUTROS: proc (se houver), entidade (se houver), descricao
 
 JSON de saída:
