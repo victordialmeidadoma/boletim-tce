@@ -5,10 +5,10 @@ import { Scale, FileText, Newspaper, History, Building2, Users, BookOpen, Briefc
 import { cn } from "@/lib/utils";
 
 const navDiario = [
-  { href: "/dashboard",         label: "Movimentação processual", icon: FileText  },
-  { href: "/dashboard/diario",  label: "Diário do TCE-MA",        icon: BookOpen  },
-  { href: "/dashboard/boletim", label: "Boletim informativo",     icon: Newspaper },
-  { href: "/historico",         label: "Histórico",               icon: History   },
+  { href: "/dashboard",               label: "Movimentação processual", icon: FileText  },
+  { href: "/dashboard/diario-manual", label: "Diário do TCE-MA",        icon: BookOpen  },
+  { href: "/dashboard/boletim",       label: "Boletim informativo",     icon: Newspaper },
+  { href: "/historico",               label: "Histórico",               icon: History   },
 ];
 
 const navCadastro = [
