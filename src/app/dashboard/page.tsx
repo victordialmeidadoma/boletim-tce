@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
-import { Plus, Trash2, CheckCircle, Loader2, FileText, ChevronDown } from "lucide-react";
+import { Plus, Trash2, CheckCircle, Loader2, FileText, ChevronDown, AlertTriangle } from "lucide-react";
 import { Processo, Municipio, Gestor } from "@/types";
 import { StatCard } from "@/components/ui/StatCard";
 import { TipoBadge } from "@/components/ui/Badge";
@@ -39,6 +39,8 @@ export default function DashboardPage() {
   const [saving,     setSaving]     = useState(false);
   const [saved,      setSaved]      = useState(false);
   const [showForm,   setShowForm]   = useState(true);
+  const [confirmApagarTudo, setConfirmApagarTudo] = useState(false);
+  const [apagandoTudo, setApagandoTudo] = useState(false);
   const today = todayISO();
 
   useEffect(() => {
@@ -104,6 +106,16 @@ export default function DashboardPage() {
       visitar_mp:    updated.filter(p => p.tipo === "VISITAR_MP").length,
       processos:     updated,
     }, { onConflict: "data" });
+  }
+
+  async function apagarTudoDoDia() {
+    setApagandoTudo(true);
+    await supabase.from("relatorios").upsert({
+      data: today, total: 0, arquivados: 0, requerem_acao: 0, visitar_mp: 0, processos: [],
+    }, { onConflict: "data" });
+    setProcessos([]);
+    setApagandoTudo(false);
+    setConfirmApagarTudo(false);
   }
 
   const arquivados   = processos.filter(p => p.tipo === "ARQUIVADO").length;
@@ -208,22 +220,45 @@ export default function DashboardPage() {
                 <h2 className="text-sm font-semibold text-ink-800">Processos do dia</h2>
                 <p className="text-xs text-ink-400 mt-0.5">{formatWeekday(today)}</p>
               </div>
-              <button
-                onClick={async () => {
-                  const res = await fetch("/api/gerar-relatorio-movimentacao", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ data: today }),
-                  });
-                  const html = await res.text();
-                  const blob = new Blob([html], { type: "text/html" });
-                  window.open(URL.createObjectURL(blob), "_blank");
-                }}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-ink-900 text-white text-xs font-medium hover:bg-ink-800"
-              >
-                <FileText className="w-3.5 h-3.5" />
-                Gerar relatório
-              </button>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={async () => {
+                    const res = await fetch("/api/gerar-relatorio-movimentacao", {
+                      method: "POST",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({ data: today }),
+                    });
+                    const html = await res.text();
+                    const blob = new Blob([html], { type: "text/html" });
+                    window.open(URL.createObjectURL(blob), "_blank");
+                  }}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-ink-900 text-white text-xs font-medium hover:bg-ink-800"
+                >
+                  <FileText className="w-3.5 h-3.5" />
+                  Gerar relatório
+                </button>
+                {!confirmApagarTudo ? (
+                  <button
+                    onClick={() => setConfirmApagarTudo(true)}
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-red-200 text-red-600 text-xs font-medium hover:bg-red-50"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                    Apagar tudo
+                  </button>
+                ) : (
+                  <div className="flex items-center gap-1.5 bg-red-50 border border-red-200 rounded-lg px-2 py-1">
+                    <AlertTriangle className="w-3.5 h-3.5 text-red-500 flex-shrink-0" />
+                    <span className="text-xs text-red-700">Confirma?</span>
+                    <button onClick={apagarTudoDoDia} disabled={apagandoTudo}
+                      className="text-xs font-semibold text-red-700 hover:text-red-900 px-1.5">
+                      {apagandoTudo ? <Loader2 className="w-3 h-3 animate-spin" /> : "Sim"}
+                    </button>
+                    <button onClick={() => setConfirmApagarTudo(false)} className="text-xs text-ink-400 hover:text-ink-700 px-1.5">
+                      Não
+                    </button>
+                  </div>
+                )}
+              </div>
             </div>
             <div className="divide-y divide-ink-100">
               {processos.map((p, i) => (

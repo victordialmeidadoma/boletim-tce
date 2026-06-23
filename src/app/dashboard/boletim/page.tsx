@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import {
   CheckCircle, AlertTriangle, Newspaper, Building2, FileText,
-  Loader2, PackageOpen, Plus, X,
+  Loader2, PackageOpen, Plus, X, Trash2,
 } from "lucide-react";
 import { Processo, MunicipioCruzado, MencaoDiario } from "@/types";
 import { StatCard } from "@/components/ui/StatCard";
@@ -24,6 +24,8 @@ export default function BoletimPage() {
   const [showBulkOpts, setShowBulkOpts] = useState(false);
 
   const [completoStatus, setCompletoStatus] = useState<"idle"|"loading">("idle");
+  const [confirmApagar, setConfirmApagar] = useState(false);
+  const [apagando, setApagando] = useState(false);
 
   const today = todayISO();
 
@@ -85,6 +87,23 @@ export default function BoletimPage() {
     await navigator.clipboard.writeText(lines.join("\n"));
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
+  }
+
+  async function apagarBoletimDoDia() {
+    setApagando(true);
+    // Apaga movimentação processual do dia
+    await supabase.from("relatorios").upsert({
+      data: today, total: 0, arquivados: 0, requerem_acao: 0, visitar_mp: 0, processos: [],
+    }, { onConflict: "data" });
+    // Apaga menções do diário do dia
+    const { data: rows } = await supabase.from("mencoes_diario_manual").select("id").eq("data", today);
+    if (rows?.length) {
+      await Promise.all(rows.map(r => supabase.from("mencoes_diario_manual").delete().eq("id", r.id)));
+    }
+    setProcessosDia([]);
+    setMunicipiosBoletim([]);
+    setApagando(false);
+    setConfirmApagar(false);
   }
 
   async function gerarPdfMunicipio(muni: string) {
@@ -189,12 +208,33 @@ export default function BoletimPage() {
                 <h2 className="text-sm font-semibold text-ink-800">Boletim — {formatWeekday(today)}</h2>
                 <p className="text-xs text-ink-400 mt-0.5">{municipiosBoletim.length} municípios</p>
               </div>
-              <button onClick={copyBoletim}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-ink-200 text-xs text-ink-600 hover:bg-ink-50">
-                {copied
-                  ? <><CheckCircle className="w-3.5 h-3.5 text-emerald-500" />Copiado!</>
-                  : <>Copiar</>}
-              </button>
+              <div className="flex items-center gap-2">
+                <button onClick={copyBoletim}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-ink-200 text-xs text-ink-600 hover:bg-ink-50">
+                  {copied
+                    ? <><CheckCircle className="w-3.5 h-3.5 text-emerald-500" />Copiado!</>
+                    : <>Copiar</>}
+                </button>
+                {!confirmApagar ? (
+                  <button onClick={() => setConfirmApagar(true)}
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-red-200 text-red-600 text-xs font-medium hover:bg-red-50">
+                    <Trash2 className="w-3.5 h-3.5" />
+                    Apagar boletim do dia
+                  </button>
+                ) : (
+                  <div className="flex items-center gap-1.5 bg-red-50 border border-red-200 rounded-lg px-2 py-1">
+                    <AlertTriangle className="w-3.5 h-3.5 text-red-500 flex-shrink-0" />
+                    <span className="text-xs text-red-700">Apaga movimentação + diário do dia. Confirma?</span>
+                    <button onClick={apagarBoletimDoDia} disabled={apagando}
+                      className="text-xs font-semibold text-red-700 hover:text-red-900 px-1.5">
+                      {apagando ? <Loader2 className="w-3 h-3 animate-spin" /> : "Sim"}
+                    </button>
+                    <button onClick={() => setConfirmApagar(false)} className="text-xs text-ink-400 hover:text-ink-700 px-1.5">
+                      Não
+                    </button>
+                  </div>
+                )}
+              </div>
             </div>
 
             <div className="p-5">

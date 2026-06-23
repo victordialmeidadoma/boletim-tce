@@ -2,56 +2,21 @@
 import { useState, useEffect } from "react";
 import {
   Plus, Trash2, CheckCircle, Building2, FileText,
-  Loader2, ChevronDown,
+  Loader2, ChevronDown, AlertTriangle,
 } from "lucide-react";
 import { Municipio, TipoDiario } from "@/types";
 import { formatWeekday, todayISO, cn } from "@/lib/utils";
-
-const TIPO_LABELS: Record<TipoDiario, string> = {
-  PLENO_ACORDAO:          "Pleno — Acórdão",
-  PLENO_DECISAO:          "Pleno — Decisão",
-  PLENO_PARECER_PREVIO:   "Pleno — Parecer prévio",
-  DESPACHO:               "Despacho",
-  CITACAO:                "Citação",
-  FISCALIZACAO_AVISO:     "Fiscalização — Aviso",
-  FISCALIZACAO_RESULTADO: "Fiscalização — Resultado",
-  PAUTA:                  "Pauta",
-  OUTROS:                 "Outros",
-};
-
-const TIPO_COLOR: Record<TipoDiario, string> = {
-  PLENO_ACORDAO:          "bg-purple-50 text-purple-700 border-purple-200",
-  PLENO_DECISAO:          "bg-purple-50 text-purple-700 border-purple-200",
-  PLENO_PARECER_PREVIO:   "bg-purple-50 text-purple-700 border-purple-200",
-  DESPACHO:               "bg-sky-50 text-sky-700 border-sky-200",
-  CITACAO:                "bg-red-50 text-red-700 border-red-200",
-  FISCALIZACAO_AVISO:     "bg-amber-50 text-amber-700 border-amber-200",
-  FISCALIZACAO_RESULTADO: "bg-amber-50 text-amber-700 border-amber-200",
-  PAUTA:                  "bg-slate-50 text-slate-700 border-slate-200",
-  OUTROS:                 "bg-ink-50 text-ink-500 border-ink-200",
-};
-
-const FIELDS_BY_TYPE: Record<TipoDiario, string[]> = {
-  PLENO_ACORDAO:          ["entidade","natureza","especie","exercicio","responsaveis","relator","decisao"],
-  PLENO_DECISAO:          ["entidade","natureza","especie","exercicio","responsaveis","relator","decisao"],
-  PLENO_PARECER_PREVIO:   ["entidade","natureza","especie","exercicio","responsaveis","relator","decisao"],
-  DESPACHO:               ["entidade","responsaveis","descricao"],
-  CITACAO:                ["entidade","natureza","exercicio","responsaveis","relator","prazo","descricao"],
-  FISCALIZACAO_AVISO:     ["entidade","descricao"],
-  FISCALIZACAO_RESULTADO: ["entidade","descricao"],
-  PAUTA:                  ["entidade","natureza","especie","exercicio","responsaveis","relator","parecer_mp"],
-  OUTROS:                 ["entidade","descricao"],
-};
+import { TIPO_LABELS, TIPO_COLOR, FIELDS_BY_TYPE, CATEGORIAS, categoriaDoTipo } from "@/lib/tipoDiario";
 
 interface FormState {
-  municipio: string; tipo: TipoDiario | ""; proc: string;
+  municipio: string; categoria: string; tipo: TipoDiario | ""; proc: string;
   entidade: string; natureza: string; especie: string;
   exercicio: string; responsaveis: string; relator: string;
   prazo: string; parecer_mp: string; decisao: string;
   descricao: string; resumo_consolidado: string;
 }
 const emptyForm: FormState = {
-  municipio:"", tipo:"", proc:"", entidade:"", natureza:"", especie:"",
+  municipio:"", categoria:"", tipo:"", proc:"", entidade:"", natureza:"", especie:"",
   exercicio:"", responsaveis:"", relator:"", prazo:"", parecer_mp:"",
   decisao:"", descricao:"", resumo_consolidado:"",
 };
@@ -68,6 +33,8 @@ export default function DiarioManualPage() {
   const [saving,     setSaving]     = useState(false);
   const [saved,      setSaved]      = useState(false);
   const [genStatus,  setGenStatus]  = useState<"idle"|"loading"|"done">("idle");
+  const [confirmApagarTudo, setConfirmApagarTudo] = useState(false);
+  const [apagandoTudo, setApagandoTudo] = useState(false);
   const today = todayISO();
 
   useEffect(() => {
@@ -113,6 +80,14 @@ export default function DiarioManualPage() {
     setMencoes(prev => prev.filter(m => m.id !== id));
   }
 
+  async function apagarTudoDoDia() {
+    setApagandoTudo(true);
+    await Promise.all(mencoes.map(m => fetch(`/api/diario-manual?id=${m.id}`, { method: "DELETE" })));
+    setMencoes([]);
+    setApagandoTudo(false);
+    setConfirmApagarTudo(false);
+  }
+
   async function gerarRelatorioDiario() {
     setGenStatus("loading");
     const res = await fetch("/api/gerar-relatorio-diario", {
@@ -127,8 +102,9 @@ export default function DiarioManualPage() {
     setTimeout(() => setGenStatus("idle"), 2000);
   }
 
+  const categoriaAtual = CATEGORIAS.find(c => c.label === form.categoria);
   const fields = form.tipo ? (FIELDS_BY_TYPE[form.tipo as TipoDiario] ?? []) : [];
-const municipiosComMencao = Array.from(new Set(mencoes.map(m => m.municipio)));
+  const municipiosComMencao = Array.from(new Set(mencoes.map(m => m.municipio)));
 
   return (
     <div className="max-w-3xl mx-auto px-6 py-8">
@@ -161,13 +137,24 @@ const municipiosComMencao = Array.from(new Set(mencoes.map(m => m.municipio)));
             </div>
           </div>
 
-          <div className="mb-3">
-            <label className="text-xs text-ink-500 font-medium block mb-1">Tipo de publicação</label>
-            <select className="field-input bg-white" value={form.tipo}
-              onChange={e => setForm(f => ({ ...f, tipo: e.target.value as TipoDiario }))}>
-              <option value="">Selecione...</option>
-              {Object.entries(TIPO_LABELS).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
-            </select>
+          <div className="grid grid-cols-2 gap-3 mb-3">
+            <div>
+              <label className="text-xs text-ink-500 font-medium block mb-1">Categoria</label>
+              <select className="field-input bg-white" value={form.categoria}
+                onChange={e => setForm(f => ({ ...f, categoria: e.target.value, tipo: "" }))}>
+                <option value="">Selecione...</option>
+                {CATEGORIAS.map(c => <option key={c.label} value={c.label}>{c.label}</option>)}
+              </select>
+            </div>
+            <div>
+              <label className="text-xs text-ink-500 font-medium block mb-1">Tipo de publicação</label>
+              <select className="field-input bg-white" value={form.tipo}
+                onChange={e => setForm(f => ({ ...f, tipo: e.target.value as TipoDiario }))}
+                disabled={!form.categoria}>
+                <option value="">{form.categoria ? "Selecione..." : "Escolha a categoria primeiro"}</option>
+                {categoriaAtual?.subtipos.map(s => <option key={s.value} value={s.value}>{s.label}</option>)}
+              </select>
+            </div>
           </div>
 
           {form.tipo && (
@@ -275,17 +262,43 @@ const municipiosComMencao = Array.from(new Set(mencoes.map(m => m.municipio)));
             <p className="text-xs text-ink-400">
               {mencoes.length} {mencoes.length === 1 ? "menção" : "menções"} · {municipiosComMencao.length} municípios
             </p>
-            <button
-              onClick={gerarRelatorioDiario}
-              disabled={genStatus === "loading"}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-ink-900 text-white text-xs font-medium hover:bg-ink-800 disabled:opacity-50"
-            >
-              {genStatus === "loading"
-                ? <><Loader2 className="w-3.5 h-3.5 animate-spin" />Gerando...</>
-                : genStatus === "done"
-                ? <><CheckCircle className="w-3.5 h-3.5" />Gerado!</>
-                : <><FileText className="w-3.5 h-3.5" />Gerar relatório do diário</>}
-            </button>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={gerarRelatorioDiario}
+                disabled={genStatus === "loading"}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-ink-900 text-white text-xs font-medium hover:bg-ink-800 disabled:opacity-50"
+              >
+                {genStatus === "loading"
+                  ? <><Loader2 className="w-3.5 h-3.5 animate-spin" />Gerando...</>
+                  : genStatus === "done"
+                  ? <><CheckCircle className="w-3.5 h-3.5" />Gerado!</>
+                  : <><FileText className="w-3.5 h-3.5" />Gerar relatório do diário</>}
+              </button>
+              {!confirmApagarTudo ? (
+                <button
+                  onClick={() => setConfirmApagarTudo(true)}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-red-200 text-red-600 text-xs font-medium hover:bg-red-50"
+                >
+                  <Trash2 className="w-3.5 h-3.5" />
+                  Apagar tudo do dia
+                </button>
+              ) : (
+                <div className="flex items-center gap-1.5 bg-red-50 border border-red-200 rounded-lg px-2 py-1">
+                  <AlertTriangle className="w-3.5 h-3.5 text-red-500 flex-shrink-0" />
+                  <span className="text-xs text-red-700">Confirma?</span>
+                  <button
+                    onClick={apagarTudoDoDia}
+                    disabled={apagandoTudo}
+                    className="text-xs font-semibold text-red-700 hover:text-red-900 px-1.5"
+                  >
+                    {apagandoTudo ? <Loader2 className="w-3 h-3 animate-spin" /> : "Sim"}
+                  </button>
+                  <button onClick={() => setConfirmApagarTudo(false)} className="text-xs text-ink-400 hover:text-ink-700 px-1.5">
+                    Não
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
 
           <div className="bg-white rounded-2xl shadow-card overflow-hidden">
