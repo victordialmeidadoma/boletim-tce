@@ -28,7 +28,7 @@ const emptyForm = {
   proc: "", exerc: "", assunto: "Contas de Governo",
   municipio_id: "", municipio_nome: "",
   responsavel_id: "", responsavel: "",
-  movimentacao: "", providencia: "Fazer manifestação",
+  movimentacao: "", providencia: "",
 };
 
 export default function DashboardPage() {
@@ -172,6 +172,7 @@ export default function DashboardPage() {
               <label className="text-xs text-ink-500 font-medium block mb-1">Providência</label>
               <select className="field-input bg-white" value={form.providencia}
                 onChange={e => setForm(f => ({ ...f, providencia: e.target.value }))}>
+                <option value="">Selecione (opcional)...</option>
                 {PROVIDENCIAS.map(p => <option key={p}>{p}</option>)}
               </select>
             </div>
@@ -207,6 +208,22 @@ export default function DashboardPage() {
                 <h2 className="text-sm font-semibold text-ink-800">Processos do dia</h2>
                 <p className="text-xs text-ink-400 mt-0.5">{formatWeekday(today)}</p>
               </div>
+              <button
+                onClick={async () => {
+                  const res = await fetch("/api/gerar-relatorio-movimentacao", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ data: today }),
+                  });
+                  const html = await res.text();
+                  const blob = new Blob([html], { type: "text/html" });
+                  window.open(URL.createObjectURL(blob), "_blank");
+                }}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-ink-900 text-white text-xs font-medium hover:bg-ink-800"
+              >
+                <FileText className="w-3.5 h-3.5" />
+                Gerar relatório
+              </button>
             </div>
             <div className="divide-y divide-ink-100">
               {processos.map((p, i) => (
