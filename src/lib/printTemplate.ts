@@ -312,19 +312,17 @@ export function generateCompletoHTML(opts: PrintCompletoOptions): string {
 <div class="page">
 
   <!-- CABEÇALHO -->
-  <div style="padding-bottom:20px;margin-bottom:20px;border-bottom:1px solid #E2E8F0">
-    <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:20px">
-      <div>
-        ${assessoria.logo_url
-          ? `<img src="${assessoria.logo_url}" style="width:34px;height:34px;object-fit:contain;border-radius:6px;margin-bottom:10px;display:block" alt="Logo">`
-          : `<div style="width:34px;height:34px;border-radius:6px;background:#EEF2FF;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#3730A3;border:0.5px solid #C7D2FE;font-family:'Inter',system-ui,sans-serif;margin-bottom:10px">${initials}</div>`
-        }
-        <p style="font-size:28px;font-weight:600;color:#111827;font-family:'Inter',system-ui,sans-serif;letter-spacing:-.02em;line-height:1.1">${assessoria.nome}</p>
-      </div>
-      <div style="text-align:right;flex-shrink:0">
-        <p style="font-size:10px;color:#94A3B8;text-transform:uppercase;letter-spacing:.07em;font-family:'Inter',system-ui,sans-serif">Boletim informativo completo</p>
-        <p style="font-size:11px;color:#64748B;margin-top:3px;font-family:'Inter',system-ui,sans-serif">${dataCapitalizada}</p>
-      </div>
+  <div style="padding-bottom:16px;margin-bottom:20px;border-bottom:1px solid #E2E8F0;display:flex;align-items:center;justify-content:space-between;gap:16px">
+    <div style="display:flex;align-items:center;gap:10px">
+      ${assessoria.logo_url
+        ? `<img src="${assessoria.logo_url}" style="width:28px;height:28px;object-fit:contain;border-radius:5px" alt="Logo">`
+        : `<div style="width:28px;height:28px;border-radius:5px;background:#EEF2FF;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:#3730A3;border:0.5px solid #C7D2FE;font-family:'Inter',system-ui,sans-serif">${initials}</div>`
+      }
+      <p style="font-size:13px;font-weight:600;color:#111827;font-family:'Inter',system-ui,sans-serif">${assessoria.nome}</p>
+    </div>
+    <div style="text-align:right;flex-shrink:0">
+      <p style="font-size:10px;color:#94A3B8;text-transform:uppercase;letter-spacing:.07em;font-family:'Inter',system-ui,sans-serif">Boletim informativo completo</p>
+      <p style="font-size:11px;color:#64748B;margin-top:3px;font-family:'Inter',system-ui,sans-serif">${dataCapitalizada}</p>
     </div>
   </div>
 
@@ -431,19 +429,17 @@ export function generateRelatorioMovimentacaoHTML(opts: PrintMovimentacaoOptions
 <div class="page">
 
   <!-- CABEÇALHO -->
-  <div style="padding-bottom:20px;margin-bottom:20px;border-bottom:1px solid #E2E8F0">
-    <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:20px">
-      <div>
-        ${assessoria.logo_url
-          ? `<img src="${assessoria.logo_url}" style="width:34px;height:34px;object-fit:contain;border-radius:6px;margin-bottom:10px;display:block" alt="Logo">`
-          : `<div style="width:34px;height:34px;border-radius:6px;background:#EEF2FF;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#3730A3;border:0.5px solid #C7D2FE;font-family:'Inter',system-ui,sans-serif;margin-bottom:10px">${initials}</div>`
-        }
-        <p style="font-size:28px;font-weight:600;color:#111827;font-family:'Inter',system-ui,sans-serif;letter-spacing:-.02em;line-height:1.1">${assessoria.nome}</p>
-      </div>
-      <div style="text-align:right;flex-shrink:0">
-        <p style="font-size:10px;color:#94A3B8;text-transform:uppercase;letter-spacing:.07em;font-family:'Inter',system-ui,sans-serif">Movimentação processual</p>
-        <p style="font-size:11px;color:#64748B;margin-top:3px;font-family:'Inter',system-ui,sans-serif">${dataCapitalizada}</p>
-      </div>
+  <div style="padding-bottom:16px;margin-bottom:20px;border-bottom:1px solid #E2E8F0;display:flex;align-items:center;justify-content:space-between;gap:16px">
+    <div style="display:flex;align-items:center;gap:10px">
+      ${assessoria.logo_url
+        ? `<img src="${assessoria.logo_url}" style="width:28px;height:28px;object-fit:contain;border-radius:5px" alt="Logo">`
+        : `<div style="width:28px;height:28px;border-radius:5px;background:#EEF2FF;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:#3730A3;border:0.5px solid #C7D2FE;font-family:'Inter',system-ui,sans-serif">${initials}</div>`
+      }
+      <p style="font-size:13px;font-weight:600;color:#111827;font-family:'Inter',system-ui,sans-serif">${assessoria.nome}</p>
+    </div>
+    <div style="text-align:right;flex-shrink:0">
+      <p style="font-size:10px;color:#94A3B8;text-transform:uppercase;letter-spacing:.07em;font-family:'Inter',system-ui,sans-serif">Movimentação processual</p>
+      <p style="font-size:11px;color:#64748B;margin-top:3px;font-family:'Inter',system-ui,sans-serif">${dataCapitalizada}</p>
     </div>
   </div>
 
@@ -555,19 +551,17 @@ export function generateRelatorioDiarioHTML(opts: PrintDiarioOptions): string {
 <div class="page">
 
   <!-- CABEÇALHO -->
-  <div style="padding-bottom:20px;margin-bottom:20px;border-bottom:1px solid #E2E8F0">
-    <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:20px">
-      <div>
-        ${assessoria.logo_url
-          ? `<img src="${assessoria.logo_url}" style="width:34px;height:34px;object-fit:contain;border-radius:6px;margin-bottom:10px;display:block" alt="Logo">`
-          : `<div style="width:34px;height:34px;border-radius:6px;background:#EEF2FF;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#3730A3;border:0.5px solid #C7D2FE;font-family:'Inter',system-ui,sans-serif;margin-bottom:10px">${initials}</div>`
-        }
-        <p style="font-size:28px;font-weight:600;color:#111827;font-family:'Inter',system-ui,sans-serif;letter-spacing:-.02em;line-height:1.1">${assessoria.nome}</p>
-      </div>
-      <div style="text-align:right;flex-shrink:0">
-        <p style="font-size:10px;color:#94A3B8;text-transform:uppercase;letter-spacing:.07em;font-family:'Inter',system-ui,sans-serif">Diário do TCE-MA</p>
-        <p style="font-size:11px;color:#64748B;margin-top:3px;font-family:'Inter',system-ui,sans-serif">${dataCapitalizada}</p>
-      </div>
+  <div style="padding-bottom:16px;margin-bottom:20px;border-bottom:1px solid #E2E8F0;display:flex;align-items:center;justify-content:space-between;gap:16px">
+    <div style="display:flex;align-items:center;gap:10px">
+      ${assessoria.logo_url
+        ? `<img src="${assessoria.logo_url}" style="width:28px;height:28px;object-fit:contain;border-radius:5px" alt="Logo">`
+        : `<div style="width:28px;height:28px;border-radius:5px;background:#EEF2FF;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:#3730A3;border:0.5px solid #C7D2FE;font-family:'Inter',system-ui,sans-serif">${initials}</div>`
+      }
+      <p style="font-size:13px;font-weight:600;color:#111827;font-family:'Inter',system-ui,sans-serif">${assessoria.nome}</p>
+    </div>
+    <div style="text-align:right;flex-shrink:0">
+      <p style="font-size:10px;color:#94A3B8;text-transform:uppercase;letter-spacing:.07em;font-family:'Inter',system-ui,sans-serif">Diário do TCE-MA</p>
+      <p style="font-size:11px;color:#64748B;margin-top:3px;font-family:'Inter',system-ui,sans-serif">${dataCapitalizada}</p>
     </div>
   </div>
 

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServerClient } from "@/lib/supabase";
 import { generateBoletimHTML } from "@/lib/printTemplate";
-import { MunicipioCruzado, Processo } from "@/types";
+import { montarMunicipiosCruzados } from "@/lib/montarBoletim";
 
 export async function POST(req: NextRequest) {
   try {
@@ -12,52 +12,25 @@ export async function POST(req: NextRequest) {
     }
 
     const db = createServerClient();
+    const municipios = await montarMunicipiosCruzados(db, data);
 
-    // Fetch boletim
-    const { data: boletim } = await db
-      .from("boletins")
-      .select("municipios")
-      .eq("data", data)
-      .single();
-
-    // Fetch movimentação
-    const { data: relatorio } = await db
-      .from("relatorios")
-      .select("processos")
-      .eq("data", data)
-      .single();
-
-    const processosDia: Processo[] = relatorio?.processos ?? [];
-    const municipios: MunicipioCruzado[] = boletim?.municipios ?? [];
-
-    // Find this municipio
     const municipioData = municipios.find(
-      (m) => m.nome.toLowerCase() === municipio_nome.toLowerCase()
+      (m) => m.nome.toUpperCase() === municipio_nome.toUpperCase()
     );
 
     if (!municipioData) {
-      return NextResponse.json({ error: "Município não encontrado no boletim." }, { status: 404 });
+      return NextResponse.json({ error: "Nenhuma informação encontrada para este município nesta data." }, { status: 404 });
     }
 
-    // Inject processos if missing
-    const municipioComProcessos: MunicipioCruzado = {
-      ...municipioData,
-      processos_dia: municipioData.processos_dia?.length
-        ? municipioData.processos_dia
-        : processosDia.filter((p) => p.municipio === municipioData.nome),
-    };
-
-    // Fetch assessoria via municipio cadastrado
     const { data: municipioCad } = await db
       .from("municipios")
-      .select("*, assessorias(id, nome, cnpj, endereco, email, logo_url), brasao_url")
+      .select("*, assessorias(id, nome, cnpj, endereco, email, logo_url)")
       .ilike("nome", municipio_nome)
       .single();
 
     const assessoria = municipioCad?.assessorias ?? { nome: "TCE-MA" };
     const brasaoUrl = municipioCad?.brasao_url;
 
-    // Fetch gestor principal (prefeito)
     const { data: gestores } = await db
       .from("gestores")
       .select("nome, cargo")
@@ -70,8 +43,8 @@ export async function POST(req: NextRequest) {
     const html = generateBoletimHTML({
       assessoria,
       municipio: {
-        ...municipioComProcessos,
-        resumo_consolidado: municipioComProcessos.resumo_consolidado,
+        ...municipioData,
+        nome: municipioCad?.nome ?? municipioData.nome,
       },
       data,
       aviso: aviso || undefined,
