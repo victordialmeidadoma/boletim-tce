@@ -152,32 +152,36 @@ export function generateBoletimHTML(opts: PrintOptions): string {
 <div class="page">
 
   <!-- CABEÇALHO -->
-  <div style="border-bottom:2px solid #111827;padding-bottom:18px;margin-bottom:0">
-    <div style="display:flex;flex-direction:column;align-items:center;gap:10px">
-      <div style="display:flex;align-items:center;justify-content:center;gap:20px">
-        ${assessoria.logo_url
-          ? `<img src="${assessoria.logo_url}" style="width:76px;height:76px;object-fit:contain;border-radius:10px" alt="Logo">`
-          : `<div style="width:76px;height:76px;border-radius:10px;background:#EEF2FF;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700;color:#3730A3;border:0.5px solid #C7D2FE;font-family:'Inter',system-ui,sans-serif">${initials}</div>`
-        }
+  <div style="padding-bottom:20px;margin-bottom:20px;border-bottom:1px solid #E2E8F0">
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:20px">
+
+      <!-- Esquerda: brasão pequeno + nome do município grande -->
+      <div>
         ${brasaoUrl
-          ? `<img src="${brasaoUrl}" style="width:76px;height:76px;object-fit:contain;border-radius:50%" alt="Brasão">`
-          : `<div style="width:76px;height:76px;border-radius:50%;background:#F1F5F9;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:600;color:#64748B;border:0.5px solid #E2E8F0;font-family:'Inter',system-ui,sans-serif">${muniLabel.substring(0,2).toUpperCase()}</div>`
+          ? `<img src="${brasaoUrl}" style="width:34px;height:34px;object-fit:contain;border-radius:50%;margin-bottom:10px;display:block" alt="Brasão">`
+          : `<div style="width:34px;height:34px;border-radius:50%;background:#F1F5F9;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:#64748B;border:0.5px solid #E2E8F0;font-family:'Inter',system-ui,sans-serif;margin-bottom:10px">${muniLabel.substring(0,2).toUpperCase()}</div>`
         }
+        <p style="font-size:28px;font-weight:600;color:#111827;font-family:'Inter',system-ui,sans-serif;letter-spacing:-.02em;line-height:1.1">${muniLabel}</p>
+        ${gestorNome ? `<p style="font-size:12px;color:#64748B;margin-top:6px;font-family:'Inter',system-ui,sans-serif">${gestorNome}${gestorCargo ? ` · ${gestorCargo}` : ""}</p>` : ""}
       </div>
-      <div style="text-align:center">
-        <p style="font-size:10px;font-weight:700;color:#4338CA;text-transform:uppercase;letter-spacing:.08em;font-family:'Inter',system-ui,sans-serif">Boletim informativo</p>
+
+      <!-- Direita: brasão + logo assessoria, data -->
+      <div style="text-align:right;flex-shrink:0">
+        <div style="display:flex;align-items:center;justify-content:flex-end;gap:10px;margin-bottom:10px">
+          ${brasaoUrl
+            ? `<img src="${brasaoUrl}" style="width:34px;height:34px;object-fit:contain;border-radius:50%" alt="Brasão">`
+            : ""
+          }
+          ${assessoria.logo_url
+            ? `<img src="${assessoria.logo_url}" style="width:34px;height:34px;object-fit:contain;border-radius:6px" alt="Logo">`
+            : ""
+          }
+        </div>
+        <p style="font-size:10px;color:#94A3B8;text-transform:uppercase;letter-spacing:.07em;font-family:'Inter',system-ui,sans-serif">Boletim informativo</p>
         <p style="font-size:11px;color:#64748B;margin-top:3px;font-family:'Inter',system-ui,sans-serif">${dataCapitalizada}</p>
       </div>
-    </div>
-  </div>
 
-  <!-- BANNER MUNICÍPIO + GESTOR -->
-  <div style="background:#111827;color:#fff;padding:12px 18px;display:flex;align-items:center;justify-content:space-between">
-    <div>
-      <p style="font-size:15px;font-weight:700;font-family:'Inter',system-ui,sans-serif;letter-spacing:-.01em">${muniLabel}</p>
-      ${gestorNome ? `<p style="font-size:11px;opacity:.6;margin-top:2px;font-family:'Inter',system-ui,sans-serif">${gestorNome}</p>` : ""}
     </div>
-    ${gestorCargo ? `<p style="font-size:11px;opacity:.5;font-family:'Inter',system-ui,sans-serif">${gestorCargo}</p>` : ""}
   </div>
 
   <!-- CORPO -->
@@ -308,14 +312,17 @@ export function generateCompletoHTML(opts: PrintCompletoOptions): string {
 <div class="page">
 
   <!-- CABEÇALHO -->
-  <div style="border-bottom:2px solid #111827;padding-bottom:18px;margin-bottom:0">
-    <div style="display:flex;flex-direction:column;align-items:center;gap:10px">
-      ${assessoria.logo_url
-        ? `<img src="${assessoria.logo_url}" style="width:76px;height:76px;object-fit:contain;border-radius:10px" alt="Logo">`
-        : `<div style="width:76px;height:76px;border-radius:10px;background:#EEF2FF;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700;color:#3730A3;border:0.5px solid #C7D2FE;font-family:'Inter',system-ui,sans-serif">${initials}</div>`
-      }
-      <div style="text-align:center">
-        <p style="font-size:10px;font-weight:700;color:#4338CA;text-transform:uppercase;letter-spacing:.08em;font-family:'Inter',system-ui,sans-serif">Boletim informativo completo</p>
+  <div style="padding-bottom:20px;margin-bottom:20px;border-bottom:1px solid #E2E8F0">
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:20px">
+      <div>
+        ${assessoria.logo_url
+          ? `<img src="${assessoria.logo_url}" style="width:34px;height:34px;object-fit:contain;border-radius:6px;margin-bottom:10px;display:block" alt="Logo">`
+          : `<div style="width:34px;height:34px;border-radius:6px;background:#EEF2FF;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#3730A3;border:0.5px solid #C7D2FE;font-family:'Inter',system-ui,sans-serif;margin-bottom:10px">${initials}</div>`
+        }
+        <p style="font-size:28px;font-weight:600;color:#111827;font-family:'Inter',system-ui,sans-serif;letter-spacing:-.02em;line-height:1.1">${assessoria.nome}</p>
+      </div>
+      <div style="text-align:right;flex-shrink:0">
+        <p style="font-size:10px;color:#94A3B8;text-transform:uppercase;letter-spacing:.07em;font-family:'Inter',system-ui,sans-serif">Boletim informativo completo</p>
         <p style="font-size:11px;color:#64748B;margin-top:3px;font-family:'Inter',system-ui,sans-serif">${dataCapitalizada}</p>
       </div>
     </div>
@@ -424,14 +431,17 @@ export function generateRelatorioMovimentacaoHTML(opts: PrintMovimentacaoOptions
 <div class="page">
 
   <!-- CABEÇALHO -->
-  <div style="border-bottom:2px solid #111827;padding-bottom:18px;margin-bottom:0">
-    <div style="display:flex;flex-direction:column;align-items:center;gap:10px">
-      ${assessoria.logo_url
-        ? `<img src="${assessoria.logo_url}" style="width:76px;height:76px;object-fit:contain;border-radius:10px" alt="Logo">`
-        : `<div style="width:76px;height:76px;border-radius:10px;background:#EEF2FF;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700;color:#3730A3;border:0.5px solid #C7D2FE;font-family:'Inter',system-ui,sans-serif">${initials}</div>`
-      }
-      <div style="text-align:center">
-        <p style="font-size:10px;font-weight:700;color:#4338CA;text-transform:uppercase;letter-spacing:.08em;font-family:'Inter',system-ui,sans-serif">Movimentação processual</p>
+  <div style="padding-bottom:20px;margin-bottom:20px;border-bottom:1px solid #E2E8F0">
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:20px">
+      <div>
+        ${assessoria.logo_url
+          ? `<img src="${assessoria.logo_url}" style="width:34px;height:34px;object-fit:contain;border-radius:6px;margin-bottom:10px;display:block" alt="Logo">`
+          : `<div style="width:34px;height:34px;border-radius:6px;background:#EEF2FF;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#3730A3;border:0.5px solid #C7D2FE;font-family:'Inter',system-ui,sans-serif;margin-bottom:10px">${initials}</div>`
+        }
+        <p style="font-size:28px;font-weight:600;color:#111827;font-family:'Inter',system-ui,sans-serif;letter-spacing:-.02em;line-height:1.1">${assessoria.nome}</p>
+      </div>
+      <div style="text-align:right;flex-shrink:0">
+        <p style="font-size:10px;color:#94A3B8;text-transform:uppercase;letter-spacing:.07em;font-family:'Inter',system-ui,sans-serif">Movimentação processual</p>
         <p style="font-size:11px;color:#64748B;margin-top:3px;font-family:'Inter',system-ui,sans-serif">${dataCapitalizada}</p>
       </div>
     </div>
@@ -545,14 +555,17 @@ export function generateRelatorioDiarioHTML(opts: PrintDiarioOptions): string {
 <div class="page">
 
   <!-- CABEÇALHO -->
-  <div style="border-bottom:2px solid #111827;padding-bottom:18px;margin-bottom:0">
-    <div style="display:flex;flex-direction:column;align-items:center;gap:10px">
-      ${assessoria.logo_url
-        ? `<img src="${assessoria.logo_url}" style="width:76px;height:76px;object-fit:contain;border-radius:10px" alt="Logo">`
-        : `<div style="width:76px;height:76px;border-radius:10px;background:#EEF2FF;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700;color:#3730A3;border:0.5px solid #C7D2FE;font-family:'Inter',system-ui,sans-serif">${initials}</div>`
-      }
-      <div style="text-align:center">
-        <p style="font-size:10px;font-weight:700;color:#4338CA;text-transform:uppercase;letter-spacing:.08em;font-family:'Inter',system-ui,sans-serif">Diário do TCE-MA</p>
+  <div style="padding-bottom:20px;margin-bottom:20px;border-bottom:1px solid #E2E8F0">
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:20px">
+      <div>
+        ${assessoria.logo_url
+          ? `<img src="${assessoria.logo_url}" style="width:34px;height:34px;object-fit:contain;border-radius:6px;margin-bottom:10px;display:block" alt="Logo">`
+          : `<div style="width:34px;height:34px;border-radius:6px;background:#EEF2FF;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#3730A3;border:0.5px solid #C7D2FE;font-family:'Inter',system-ui,sans-serif;margin-bottom:10px">${initials}</div>`
+        }
+        <p style="font-size:28px;font-weight:600;color:#111827;font-family:'Inter',system-ui,sans-serif;letter-spacing:-.02em;line-height:1.1">${assessoria.nome}</p>
+      </div>
+      <div style="text-align:right;flex-shrink:0">
+        <p style="font-size:10px;color:#94A3B8;text-transform:uppercase;letter-spacing:.07em;font-family:'Inter',system-ui,sans-serif">Diário do TCE-MA</p>
         <p style="font-size:11px;color:#64748B;margin-top:3px;font-family:'Inter',system-ui,sans-serif">${dataCapitalizada}</p>
       </div>
     </div>
