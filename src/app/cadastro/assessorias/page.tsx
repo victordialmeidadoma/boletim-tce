@@ -9,6 +9,10 @@ const emptyForm = {
   nome: "", cnpj: "", endereco: "", email: "", telefone: "", logo_url: "",
 };
 
+function ordenarPorNome<T extends { nome: string }>(arr: T[]): T[] {
+  return [...arr].sort((a, b) => a.nome.localeCompare(b.nome, "pt-BR"));
+}
+
 export default function AssessoriasPage() {
   const [assessorias, setAssessorias] = useState<Assessoria[]>([]);
   const [loading, setLoading]         = useState(true);
@@ -21,7 +25,7 @@ export default function AssessoriasPage() {
 
   useEffect(() => {
     fetch("/api/assessorias").then(r => r.json()).then(data => {
-      setAssessorias(data);
+      setAssessorias(ordenarPorNome(data));
       setLoading(false);
     });
   }, []);
@@ -49,8 +53,19 @@ export default function AssessoriasPage() {
 
     if (logoFile) {
       const ext  = logoFile.name.split(".").pop();
-      const path = `logos/${form.nome.toLowerCase().replace(/\s+/g, "_")}.${ext}`;
-      await supabase.storage.from("assets").upload(path, logoFile, { upsert: true });
+      const slug = form.nome
+        .toLowerCase()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .replace(/[^a-z0-9]+/g, "_")
+        .replace(/^_+|_+$/g, "");
+      const path = `logos/${slug}-${Date.now()}.${ext}`;
+      const { error: uploadError } = await supabase.storage.from("assets").upload(path, logoFile, { upsert: true });
+      if (uploadError) {
+        alert(`Erro ao enviar a logo: ${uploadError.message}`);
+        setSaving(false);
+        return;
+      }
       const { data: url } = supabase.storage.from("assets").getPublicUrl(path);
       logo_url = url.publicUrl;
     }
@@ -62,7 +77,7 @@ export default function AssessoriasPage() {
         body: JSON.stringify({ id: editingId, ...form, logo_url }),
       });
       const atualizado = await res.json();
-      setAssessorias(prev => prev.map(a => a.id === editingId ? atualizado : a));
+      setAssessorias(prev => ordenarPorNome(prev.map(a => a.id === editingId ? atualizado : a)));
       setEditingId(null);
     } else {
       const res  = await fetch("/api/assessorias", {
@@ -71,7 +86,7 @@ export default function AssessoriasPage() {
         body: JSON.stringify({ ...form, logo_url }),
       });
       const novo = await res.json();
-      setAssessorias(prev => [novo, ...prev]);
+      setAssessorias(prev => ordenarPorNome([novo, ...prev]));
     }
 
     setForm(emptyForm);

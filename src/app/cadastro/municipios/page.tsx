@@ -9,6 +9,10 @@ const ESTADOS = ["Maranhão","Pará","Piauí","Tocantins","Ceará","Bahia","Outr
 
 const emptyForm = { nome: "", estado: "Maranhão", assessoria_id: "", brasao_url: "" };
 
+function ordenarPorNome<T extends { nome: string }>(arr: T[]): T[] {
+  return [...arr].sort((a, b) => a.nome.localeCompare(b.nome, "pt-BR"));
+}
+
 export default function MunicipiosPage() {
   const [municipios, setMunicipios]   = useState<(Municipio & { assessorias?: Assessoria })[]>([]);
   const [assessorias, setAssessorias] = useState<Assessoria[]>([]);
@@ -25,7 +29,7 @@ export default function MunicipiosPage() {
       fetch("/api/municipios").then(r => r.json()),
       supabase.from("assessorias").select("*").order("nome").then(r => r.data ?? []),
     ]).then(([munis, assess]) => {
-      setMunicipios(munis);
+      setMunicipios(ordenarPorNome(munis));
       setAssessorias(assess as Assessoria[]);
       setLoading(false);
     });
@@ -56,8 +60,19 @@ export default function MunicipiosPage() {
 
     if (brasaoFile) {
       const ext  = brasaoFile.name.split(".").pop();
-      const path = `brasoes/${form.nome.toLowerCase().replace(/\s+/g,"_")}.${ext}`;
-      await supabase.storage.from("assets").upload(path, brasaoFile, { upsert: true });
+      const slug = form.nome
+        .toLowerCase()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .replace(/[^a-z0-9]+/g, "_")
+        .replace(/^_+|_+$/g, "");
+      const path = `brasoes/${slug}-${Date.now()}.${ext}`;
+      const { error: uploadError } = await supabase.storage.from("assets").upload(path, brasaoFile, { upsert: true });
+      if (uploadError) {
+        alert(`Erro ao enviar o brasão: ${uploadError.message}`);
+        setSaving(false);
+        return;
+      }
       const { data: url } = supabase.storage.from("assets").getPublicUrl(path);
       brasao_url = url.publicUrl;
     }
@@ -76,7 +91,7 @@ export default function MunicipiosPage() {
         body: JSON.stringify({ id: editingId, ...payload }),
       });
       const atualizado = await res.json();
-      setMunicipios(prev => prev.map(m => m.id === editingId ? { ...atualizado, assessorias: assessorias.find(a => a.id === atualizado.assessoria_id) } : m));
+      setMunicipios(prev => ordenarPorNome(prev.map(m => m.id === editingId ? { ...atualizado, assessorias: assessorias.find(a => a.id === atualizado.assessoria_id) } : m)));
       setEditingId(null);
     } else {
       const res  = await fetch("/api/municipios", {
@@ -85,7 +100,7 @@ export default function MunicipiosPage() {
         body: JSON.stringify(payload),
       });
       const novo = await res.json();
-      setMunicipios(prev => [{ ...novo, assessorias: assessorias.find(a => a.id === novo.assessoria_id) }, ...prev]);
+      setMunicipios(prev => ordenarPorNome([{ ...novo, assessorias: assessorias.find(a => a.id === novo.assessoria_id) }, ...prev]));
     }
 
     setForm(emptyForm);
