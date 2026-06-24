@@ -412,17 +412,42 @@ interface PrintMovimentacaoOptions {
   qrCodeDataUri?: string;
 }
 
+const TIPO_PROVIDENCIA_LABEL: Record<string, string> = {
+  ARQUIVADO: "Arquivado",
+  FAZER_MANIFESTACAO: "",
+  RECURSO_RECONSIDERACAO: "",
+  VISITAR_MP: "",
+  OUTROS: "",
+};
+
+function renderProcessoEditorial(p: Processo): string {
+  const isUrgencia = p.urgencia === "urgencia";
+  const isAtencao  = p.urgencia === "atencao";
+  const barColor   = isUrgencia ? "#DC2626" : isAtencao ? "#D97706" : "#E2E8F0";
+  const tagColor   = isUrgencia ? "#DC2626" : isAtencao ? "#D97706" : "#94A3B8";
+  const tagLabel   = isUrgencia ? "Urgência" : isAtencao ? "Atenção" : (TIPO_PROVIDENCIA_LABEL[p.tipo] ?? "");
+
+  return `
+  <div style="border-left:3px solid ${barColor};padding-left:16px;margin-bottom:24px">
+    <div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:4px">
+      <p style="font-family:monospace;font-size:13px;color:#64748B;font-family:'Inter',system-ui,sans-serif;margin:0">${p.proc} <span style="color:#94A3B8">· ${p.exerc}</span></p>
+      ${tagLabel ? `<span style="font-size:11px;font-weight:600;color:${tagColor};text-transform:uppercase;letter-spacing:.04em;font-family:'Inter',system-ui,sans-serif;flex-shrink:0">${tagLabel}</span>` : ""}
+    </div>
+    <p style="font-size:16px;font-weight:600;color:#111827;font-family:'Inter',system-ui,sans-serif;margin:0 0 6px;letter-spacing:-.01em">${p.assunto}</p>
+    <p style="font-size:14px;color:#475569;line-height:1.6;font-family:'Inter',system-ui,sans-serif;margin:0 0 8px">${p.movimentacao}</p>
+    <p style="font-size:12px;color:#94A3B8;font-family:'Inter',system-ui,sans-serif;margin:0">Resp.: ${p.responsavel}</p>
+  </div>`;
+}
+
 export function generateRelatorioMovimentacaoHTML(opts: PrintMovimentacaoOptions): string {
   const { processos, data, qrCodeDataUri } = opts;
   const dataFormatada = formatDate(data, "EEEE, dd 'de' MMMM 'de' yyyy");
   const dataCapitalizada = dataFormatada.charAt(0).toUpperCase() + dataFormatada.slice(1);
 
-  const arquivados    = processos.filter(p => p.tipo === "ARQUIVADO").length;
-  const requeremAcao  = processos.filter(p => p.tipo !== "ARQUIVADO").length;
-  const urgentes      = processos.filter(p => p.urgencia === "urgencia").length;
-  const emAtencao     = processos.filter(p => p.urgencia === "atencao").length;
+  const arquivados = processos.filter(p => p.tipo === "ARQUIVADO").length;
+  const urgentes    = processos.filter(p => p.urgencia === "urgencia").length;
+  const emAtencao   = processos.filter(p => p.urgencia === "atencao").length;
 
-  // group by municipio
   const byMuni: Record<string, Processo[]> = {};
   for (const p of processos) {
     if (!byMuni[p.municipio]) byMuni[p.municipio] = [];
@@ -445,13 +470,13 @@ export function generateRelatorioMovimentacaoHTML(opts: PrintMovimentacaoOptions
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: 'Inter', system-ui, sans-serif; font-size: 12px; color: #111827; background: #fff; }
-  @page { size: A4; margin: 16mm 16mm 14mm; }
+  body { font-family: 'Inter', system-ui, sans-serif; font-size: 13px; color: #111827; background: #fff; }
+  @page { size: A4; margin: 18mm 16mm 16mm; }
   @media print {
     body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
     .no-print { display: none !important; }
   }
-  .page { max-width: 720px; margin: 0 auto; }
+  .page { max-width: 700px; margin: 0 auto; }
   .print-btn { position: fixed; bottom: 24px; right: 24px; background: #111827; color: #fff; border: none; border-radius: 8px; padding: 10px 20px; font-size: 13px; font-weight: 500; cursor: pointer; font-family: 'Inter', system-ui, sans-serif; display: flex; align-items: center; gap: 8px; box-shadow: 0 4px 12px rgba(0,0,0,.15); }
   .print-btn:hover { background: #374151; }
   a { text-decoration: none; }
@@ -466,76 +491,69 @@ export function generateRelatorioMovimentacaoHTML(opts: PrintMovimentacaoOptions
 <div class="page">
 
   <!-- CABEÇALHO -->
-  <div style="padding-bottom:18px;margin-bottom:22px;border-bottom:2px solid #111827">
-    <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:16px">
-      <div>
-        <p style="font-size:26px;font-weight:700;color:#111827;font-family:'Inter',system-ui,sans-serif;letter-spacing:-.02em;line-height:1.1">Movimentação Processual</p>
-        <p style="font-size:11px;color:#64748B;font-family:'Inter',system-ui,sans-serif;margin-top:4px">${dataCapitalizada}</p>
-      </div>
-      <p style="font-size:10px;color:#94A3B8;text-transform:uppercase;letter-spacing:.08em;font-family:'Inter',system-ui,sans-serif;flex-shrink:0">TCE-MA</p>
+  <div style="padding-bottom:24px;margin-bottom:32px;border-bottom:1px solid #E2E8F0">
+    <p style="font-size:12px;color:#94A3B8;text-transform:uppercase;letter-spacing:.06em;font-family:'Inter',system-ui,sans-serif;margin:0 0 4px">TCE-MA</p>
+    <h1 style="font-size:32px;font-weight:600;color:#111827;font-family:'Inter',system-ui,sans-serif;letter-spacing:-.01em;margin:0">Movimentação processual</h1>
+    <p style="font-size:15px;color:#64748B;font-family:'Inter',system-ui,sans-serif;margin:6px 0 0">${dataCapitalizada}</p>
+  </div>
+
+  <!-- RESUMO: tira única dividida -->
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:#E2E8F0;border-radius:10px;overflow:hidden;margin-bottom:28px">
+    <div style="background:#fff;padding:18px 14px">
+      <p style="font-size:26px;font-weight:600;color:#111827;font-family:'Inter',system-ui,sans-serif;line-height:1;margin:0">${processos.length}</p>
+      <p style="font-size:12px;color:#64748B;font-family:'Inter',system-ui,sans-serif;margin:6px 0 0">processos</p>
+    </div>
+    <div style="background:#fff;padding:18px 14px">
+      <p style="font-size:26px;font-weight:600;color:#94A3B8;font-family:'Inter',system-ui,sans-serif;line-height:1;margin:0">${arquivados}</p>
+      <p style="font-size:12px;color:#64748B;font-family:'Inter',system-ui,sans-serif;margin:6px 0 0">arquivados</p>
+    </div>
+    <div style="background:#fff;padding:18px 14px">
+      <p style="font-size:26px;font-weight:600;color:#D97706;font-family:'Inter',system-ui,sans-serif;line-height:1;margin:0">${emAtencao}</p>
+      <p style="font-size:12px;color:#64748B;font-family:'Inter',system-ui,sans-serif;margin:6px 0 0">atenção</p>
+    </div>
+    <div style="background:#fff;padding:18px 14px">
+      <p style="font-size:26px;font-weight:600;color:#DC2626;font-family:'Inter',system-ui,sans-serif;line-height:1;margin:0">${urgentes}</p>
+      <p style="font-size:12px;color:#64748B;font-family:'Inter',system-ui,sans-serif;margin:6px 0 0">urgência</p>
     </div>
   </div>
 
-  <!-- RESUMO -->
-  <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:20px">
-    <div style="background:#F8FAFC;border-radius:8px;padding:12px 8px;text-align:center;border:0.5px solid #F1F5F9">
-      <p style="font-size:22px;font-weight:700;color:#111827;font-family:'Inter',system-ui,sans-serif;line-height:1">${processos.length}</p>
-      <p style="font-size:8.5px;color:#94A3B8;text-transform:uppercase;letter-spacing:.04em;font-family:'Inter',system-ui,sans-serif;margin-top:3px">Processos</p>
+  <!-- MUNICÍPIOS: pílulas -->
+  <div style="margin-bottom:32px">
+    <p style="font-size:12px;color:#94A3B8;text-transform:uppercase;letter-spacing:.06em;font-family:'Inter',system-ui,sans-serif;margin:0 0 10px">Municípios</p>
+    <div style="display:flex;flex-wrap:wrap;gap:8px">
+      ${municipiosOrdenados.map(([muni, procs]) => {
+        const hasUrgencia = procs.some(p => p.urgencia === "urgencia");
+        const hasAtencao  = procs.some(p => p.urgencia === "atencao");
+        const dotColor = hasUrgencia ? "#DC2626" : hasAtencao ? "#D97706" : "#CBD5E1";
+        const muniLabel = muni.charAt(0) + muni.slice(1).toLowerCase();
+        return `<a href="#${slug(muni)}" style="display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:999px;border:1px solid #E2E8F0;font-size:13px;color:#111827;font-family:'Inter',system-ui,sans-serif">
+          <span style="width:6px;height:6px;border-radius:50%;background:${dotColor};display:inline-block;flex-shrink:0"></span>
+          ${muniLabel}
+        </a>`;
+      }).join("")}
     </div>
-    <div style="background:#F8FAFC;border-radius:8px;padding:12px 8px;text-align:center;border:0.5px solid #F1F5F9">
-      <p style="font-size:22px;font-weight:700;color:#64748B;font-family:'Inter',system-ui,sans-serif;line-height:1">${arquivados}</p>
-      <p style="font-size:8.5px;color:#94A3B8;text-transform:uppercase;letter-spacing:.04em;font-family:'Inter',system-ui,sans-serif;margin-top:3px">Arquivados</p>
-    </div>
-    <div style="background:#EFF6FF;border-radius:8px;padding:12px 8px;text-align:center;border:0.5px solid #DBEAFE">
-      <p style="font-size:22px;font-weight:700;color:#1D4ED8;font-family:'Inter',system-ui,sans-serif;line-height:1">${requeremAcao}</p>
-      <p style="font-size:8.5px;color:#1D4ED8;text-transform:uppercase;letter-spacing:.04em;font-family:'Inter',system-ui,sans-serif;margin-top:3px">Requerem ação</p>
-    </div>
-    <div style="background:#FFFBEB;border-radius:8px;padding:12px 8px;text-align:center;border:0.5px solid #FDE68A">
-      <p style="font-size:22px;font-weight:700;color:#92400E;font-family:'Inter',system-ui,sans-serif;line-height:1">${emAtencao}</p>
-      <p style="font-size:8.5px;color:#92400E;text-transform:uppercase;letter-spacing:.04em;font-family:'Inter',system-ui,sans-serif;margin-top:3px">Atenção</p>
-    </div>
-    <div style="background:#FEF2F2;border-radius:8px;padding:12px 8px;text-align:center;border:0.5px solid #FCA5A5">
-      <p style="font-size:22px;font-weight:700;color:#991B1B;font-family:'Inter',system-ui,sans-serif;line-height:1">${urgentes}</p>
-      <p style="font-size:8.5px;color:#991B1B;text-transform:uppercase;letter-spacing:.04em;font-family:'Inter',system-ui,sans-serif;margin-top:3px">Urgência</p>
-    </div>
-  </div>
-
-  <!-- ÍNDICE -->
-  <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:22px">
-    ${municipiosOrdenados.map(([muni, procs]) => {
-      const hasUrgencia = procs.some(p => p.urgencia === "urgencia");
-      const hasAtencao  = procs.some(p => p.urgencia === "atencao");
-      const dotColor = hasUrgencia ? "#EF4444" : hasAtencao ? "#F59E0B" : "#CBD5E1";
-      const muniLabel = muni.charAt(0) + muni.slice(1).toLowerCase();
-      return `<a href="#${slug(muni)}" style="display:inline-flex;align-items:center;gap:5px;background:#F8FAFC;border:0.5px solid #E2E8F0;border-radius:99px;padding:4px 10px;font-size:10px;color:#374151;font-family:'Inter',system-ui,sans-serif">
-        <span style="width:6px;height:6px;border-radius:50%;background:${dotColor};display:inline-block;flex-shrink:0"></span>
-        ${muniLabel} (${procs.length})
-      </a>`;
-    }).join("")}
   </div>
 
   <!-- CORPO -->
   <div>
     ${municipiosOrdenados.map(([muni, procs]) => {
       const muniLabel = muni.charAt(0) + muni.slice(1).toLowerCase();
-      const hasUrgencia = procs.some(p => p.urgencia === "urgencia");
-      const hasAtencao  = procs.some(p => p.urgencia === "atencao");
-      const barColor = hasUrgencia ? "#991B1B" : hasAtencao ? "#92400E" : "#111827";
       return `
-      <div id="${slug(muni)}" style="margin-bottom:22px">
-        <div style="background:${barColor};color:#fff;padding:9px 14px;border-radius:6px;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between">
-          <p style="font-size:13px;font-weight:700;font-family:'Inter',system-ui,sans-serif;letter-spacing:-.01em">${muniLabel}</p>
-          <p style="font-size:10px;opacity:.75;font-family:'Inter',system-ui,sans-serif">${procs.length} processo${procs.length > 1 ? "s" : ""}</p>
+      <div id="${slug(muni)}" style="margin-bottom:36px">
+        <div style="display:flex;align-items:baseline;gap:10px;margin-bottom:4px">
+          <h2 style="font-size:20px;font-weight:600;color:#111827;font-family:'Inter',system-ui,sans-serif;letter-spacing:-.01em;margin:0">${muniLabel}</h2>
+          <span style="font-size:13px;color:#94A3B8;font-family:'Inter',system-ui,sans-serif">${procs.length} processo${procs.length > 1 ? "s" : ""}</span>
         </div>
-        ${procs.map(renderProcesso).join("")}
+        <div style="height:1px;background:#E2E8F0;margin:12px 0 20px"></div>
+        ${procs.map(renderProcessoEditorial).join("")}
       </div>`;
     }).join("")}
   </div>
 
   <!-- RODAPÉ -->
-  <div style="border-top:0.5px solid #E2E8F0;padding-top:12px;display:flex;justify-content:space-between;align-items:center">
-    <p style="font-size:9px;color:#94A3B8;font-family:'Inter',system-ui,sans-serif">Gerado em ${new Date().toLocaleDateString("pt-BR")} · TCE-MA</p>
-    ${qrCodeDataUri ? `<img src="${qrCodeDataUri}" alt="QR code" style="width:46px;height:46px;flex-shrink:0">` : ""}
+  <div style="display:flex;align-items:center;justify-content:space-between;padding-top:20px;border-top:0.5px solid #E2E8F0">
+    <p style="font-size:12px;color:#94A3B8;font-family:'Inter',system-ui,sans-serif;margin:0">Gerado em ${new Date().toLocaleDateString("pt-BR")} · TCE-MA</p>
+    ${qrCodeDataUri ? `<img src="${qrCodeDataUri}" alt="QR code" style="width:48px;height:48px;flex-shrink:0">` : ""}
   </div>
 
 </div>
