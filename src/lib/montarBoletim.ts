@@ -1,6 +1,11 @@
 import { createServerClient } from "@/lib/supabase";
 import { MunicipioCruzado, Processo, MencaoDiario } from "@/types";
 
+/**
+ * Monta a lista de municípios cruzados (movimentação + diário) para uma data,
+ * lendo direto de `relatorios` e `mencoes_diario_manual` — sem depender da
+ * tabela `boletins`, que não é mais a fonte de verdade.
+ */
 export async function montarMunicipiosCruzados(
   db: ReturnType<typeof createServerClient>,
   data: string
@@ -38,6 +43,7 @@ export async function montarMunicipiosCruzados(
       parecer_mp: r.parecer_mp,
       decisao: r.decisao,
       descricao: r.descricao,
+      urgencia: r.urgencia ?? "normal",
     });
     if (r.resumo_consolidado) resumos[key] = r.resumo_consolidado;
   }

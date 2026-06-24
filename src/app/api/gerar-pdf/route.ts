@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createServerClient } from "@/lib/supabase";
 import { generateBoletimHTML } from "@/lib/printTemplate";
 import { montarMunicipiosCruzados } from "@/lib/montarBoletim";
+import { gerarQRCodeDataUri, urlPublicaBoletim } from "@/lib/qrcode";
 
 export async function POST(req: NextRequest) {
   try {
@@ -40,11 +41,19 @@ export async function POST(req: NextRequest) {
 
     const gestorPrincipal = gestores?.[0];
 
+    const nomeFinal = municipioCad?.nome ?? municipioData.nome;
+    let qrCodeDataUri: string | undefined;
+    try {
+      qrCodeDataUri = await gerarQRCodeDataUri(urlPublicaBoletim(nomeFinal, data));
+    } catch {
+      qrCodeDataUri = undefined;
+    }
+
     const html = generateBoletimHTML({
       assessoria,
       municipio: {
         ...municipioData,
-        nome: municipioCad?.nome ?? municipioData.nome,
+        nome: nomeFinal,
       },
       data,
       aviso: aviso || undefined,
@@ -52,6 +61,7 @@ export async function POST(req: NextRequest) {
       brasaoUrl,
       gestorNome: gestorPrincipal?.nome,
       gestorCargo: gestorPrincipal?.cargo,
+      qrCodeDataUri,
     });
 
     return new NextResponse(html, {

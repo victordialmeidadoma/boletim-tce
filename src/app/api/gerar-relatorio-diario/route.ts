@@ -28,6 +28,7 @@ export async function POST(req: NextRequest) {
       decisao: r.decisao,
       descricao: r.descricao,
       municipio: r.municipio,
+      urgencia: r.urgencia ?? "normal",
     }));
 
     if (mencoes.length === 0) {

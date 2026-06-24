@@ -19,7 +19,7 @@ O JSON deve ter exatamente esta estrutura:
       "movimentacao": "resumo da movimentação em 1-2 frases",
       "providencia": "o que precisa ser feito",
       "tipo": "ARQUIVADO" | "FAZER_MANIFESTACAO" | "RECURSO_RECONSIDERACAO" | "VISITAR_MP" | "OUTROS",
-      "urgencia": "normal" | "atencao" | "critica"
+      "urgencia": "normal" | "atencao" | "urgencia"
     }
   ]
 }
@@ -29,7 +29,7 @@ Regras de classificação:
 - tipo FAZER_MANIFESTACAO: quando há "FAZER MANIFESTAÇÃO" na providência
 - tipo RECURSO_RECONSIDERACAO: quando há "FAZER RECURSO DE RECONSIDERAÇÃO"
 - tipo VISITAR_MP: quando há "Visitar o MP de CONTAS"
-- urgencia critica: DESAPROVAÇÃO com múltiplas ocorrências
+- urgencia urgencia: DESAPROVAÇÃO com múltiplas ocorrências
 - urgencia atencao: requer manifestação, recurso ou visita ao MP
 - urgencia normal: arquivados ou meramente informativos
 

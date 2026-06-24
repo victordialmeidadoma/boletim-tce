@@ -37,7 +37,7 @@ export function UrgenciaIndicator({ urgencia }: { urgencia: UrgenciaProcesso }) 
   return (
     <span
       className={cn("inline-block w-1.5 h-1.5 rounded-full flex-shrink-0 mt-1.5", {
-        "bg-red-500": urgencia === "critica",
+        "bg-red-500": urgencia === "urgencia",
         "bg-amber-400": urgencia === "atencao",
         "bg-ink-300": urgencia === "normal",
       })}

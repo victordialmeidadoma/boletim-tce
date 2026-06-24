@@ -19,6 +19,7 @@ interface PrintOptions {
   brasaoUrl?: string;
   gestorNome?: string;
   gestorCargo?: string;
+  qrCodeDataUri?: string;
 }
 
 const TIPO_LABELS: Record<TipoDiario, string> = {
@@ -58,17 +59,27 @@ function field(label: string, value: string | undefined, warn = false): string {
     </tr>`;
 }
 
+function urgenciaStyle(urgencia?: string): { border: string; bg: string; badge?: string } {
+  if (urgencia === "urgencia") return { border: "#FCA5A5", bg: "#FEF2F2", badge: "Urgência" };
+  if (urgencia === "atencao")  return { border: "#FCD34D", bg: "#FFFBEB", badge: "Atenção" };
+  return { border: "#E2E8F0", bg: "#FAFAFA" };
+}
+
 function renderMencao(m: MencaoDiario): string {
   const s = TIPO_STYLE[m.tipo] ?? TIPO_STYLE.OUTROS;
   const label = TIPO_LABELS[m.tipo] ?? m.tipo;
   const resps = m.responsaveis?.join("; ") ?? "";
+  const u = urgenciaStyle(m.urgencia);
   return `
-  <div style="border:0.5px solid #E2E8F0;border-radius:6px;overflow:hidden;margin-bottom:10px">
+  <div style="border:1.5px solid ${u.border};border-radius:6px;overflow:hidden;margin-bottom:10px">
     <div style="display:flex;align-items:center;justify-content:space-between;background:${s.bg};border-bottom:0.5px solid ${s.border};padding:7px 12px">
       <span style="font-size:10px;font-weight:600;color:${s.color};text-transform:uppercase;letter-spacing:.05em;font-family:'Inter',system-ui,sans-serif">${label}</span>
-      ${m.proc ? `<span style="font-size:10px;font-family:monospace;color:${s.color};opacity:.7">${m.proc}</span>` : ""}
+      <div style="display:flex;align-items:center;gap:6px">
+        ${u.badge ? `<span style="font-size:9px;font-weight:700;color:${u.border === "#FCA5A5" ? "#991B1B" : "#92400E"};background:#fff;border:0.5px solid ${u.border};border-radius:99px;padding:1px 7px;text-transform:uppercase;letter-spacing:.04em;font-family:'Inter',system-ui,sans-serif">${u.badge}</span>` : ""}
+        ${m.proc ? `<span style="font-size:10px;font-family:monospace;color:${s.color};opacity:.7">${m.proc}</span>` : ""}
+      </div>
     </div>
-    <div style="padding:10px 12px;background:#fff">
+    <div style="padding:10px 12px;background:${u.bg}">
       <table style="width:100%;border-collapse:collapse">
         ${field("Entidade", m.entidade)}
         ${m.natureza ? field("Natureza", `${m.natureza}${m.especie ? ` — ${m.especie}` : ""}`) : ""}
@@ -92,9 +103,10 @@ function renderMencao(m: MencaoDiario): string {
 }
 
 function renderProcesso(p: Processo): string {
+  const u = urgenciaStyle(p.urgencia);
   return `
-  <div style="border:0.5px solid #E2E8F0;border-radius:6px;overflow:hidden;margin-bottom:12px">
-    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;border-bottom:0.5px solid #F1F5F9">
+  <div style="border:1.5px solid ${u.border};border-radius:6px;overflow:hidden;margin-bottom:12px">
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;border-bottom:0.5px solid #F1F5F9;background:#fff">
       <div style="padding:8px 12px;border-right:0.5px solid #F1F5F9">
         <div style="font-size:9px;color:#94A3B8;text-transform:uppercase;letter-spacing:.06em;margin-bottom:2px;font-family:'Inter',system-ui,sans-serif">Processo</div>
         <div style="font-size:12px;color:#111;font-weight:500;font-family:monospace">${p.proc}</div>
@@ -104,11 +116,16 @@ function renderProcesso(p: Processo): string {
         <div style="font-size:12px;color:#111;font-weight:500;font-family:'Inter',system-ui,sans-serif">${p.exerc}</div>
       </div>
       <div style="padding:8px 12px">
-        <div style="font-size:9px;color:#94A3B8;text-transform:uppercase;letter-spacing:.06em;margin-bottom:2px;font-family:'Inter',system-ui,sans-serif">Assunto</div>
-        <div style="font-size:12px;color:#111;font-weight:500;font-family:'Inter',system-ui,sans-serif">${p.assunto}</div>
+        <div style="display:flex;align-items:center;justify-content:space-between">
+          <div>
+            <div style="font-size:9px;color:#94A3B8;text-transform:uppercase;letter-spacing:.06em;margin-bottom:2px;font-family:'Inter',system-ui,sans-serif">Assunto</div>
+            <div style="font-size:12px;color:#111;font-weight:500;font-family:'Inter',system-ui,sans-serif">${p.assunto}</div>
+          </div>
+          ${u.badge ? `<span style="font-size:9px;font-weight:700;color:${u.border === "#FCA5A5" ? "#991B1B" : "#92400E"};background:${u.bg};border:0.5px solid ${u.border};border-radius:99px;padding:2px 8px;text-transform:uppercase;letter-spacing:.04em;font-family:'Inter',system-ui,sans-serif">${u.badge}</span>` : ""}
+        </div>
       </div>
     </div>
-    <div style="padding:10px 12px;background:#FAFAFA">
+    <div style="padding:10px 12px;background:${u.bg}">
       <div style="font-size:9px;color:#94A3B8;text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px;font-family:'Inter',system-ui,sans-serif">Movimentação</div>
       <div style="font-size:12px;color:#374151;line-height:1.6;font-family:'Inter',system-ui,sans-serif">${p.movimentacao}</div>
       <div style="font-size:10px;color:#94A3B8;margin-top:6px;font-family:'Inter',system-ui,sans-serif">Resp.: ${p.responsavel}</div>
@@ -117,7 +134,7 @@ function renderProcesso(p: Processo): string {
 }
 
 export function generateBoletimHTML(opts: PrintOptions): string {
-  const { assessoria, municipio, data, aviso, imagemUrl, imagemLegenda, brasaoUrl, gestorNome, gestorCargo } = opts;
+  const { assessoria, municipio, data, aviso, imagemUrl, imagemLegenda, brasaoUrl, gestorNome, gestorCargo, qrCodeDataUri } = opts;
   const dataFormatada = formatDate(data, "EEEE, dd 'de' MMMM 'de' yyyy");
   const dataCapitalizada = dataFormatada.charAt(0).toUpperCase() + dataFormatada.slice(1);
   const initials = assessoria.nome.split(" ").slice(0, 2).map((w: string) => w[0]).join("").toUpperCase();
@@ -220,16 +237,20 @@ export function generateBoletimHTML(opts: PrintOptions): string {
   </div>
 
   <!-- RODAPÉ -->
-  <div style="border-top:0.5px solid #E2E8F0;padding-top:10px;display:flex;justify-content:space-between;align-items:flex-start">
+  <div style="border-top:0.5px solid #E2E8F0;padding-top:10px;display:flex;justify-content:space-between;align-items:flex-end;gap:16px">
     <div style="text-align:left">
       <p style="font-size:10px;font-weight:600;color:#374151;font-family:'Inter',system-ui,sans-serif">${assessoria.nome}</p>
       ${assessoria.cnpj ? `<p style="font-size:9px;color:#94A3B8;margin-top:1px;font-family:'Inter',system-ui,sans-serif">CNPJ ${assessoria.cnpj}</p>` : ""}
       ${assessoria.endereco ? `<p style="font-size:9px;color:#94A3B8;font-family:'Inter',system-ui,sans-serif">${assessoria.endereco}</p>` : ""}
       ${assessoria.email ? `<p style="font-size:9px;color:#94A3B8;font-family:'Inter',system-ui,sans-serif">${assessoria.email}</p>` : ""}
     </div>
-    <div style="text-align:right">
-      <p style="font-size:9px;color:#94A3B8;font-family:'Inter',system-ui,sans-serif">Gerado em ${new Date().toLocaleDateString("pt-BR")}</p>
-      <p style="font-size:9px;color:#94A3B8;margin-top:1px;font-family:'Inter',system-ui,sans-serif">TCE-MA · Boletim informativo</p>
+    <div style="display:flex;align-items:flex-end;gap:10px">
+      <div style="text-align:right">
+        <p style="font-size:9px;color:#94A3B8;font-family:'Inter',system-ui,sans-serif">Gerado em ${new Date().toLocaleDateString("pt-BR")}</p>
+        <p style="font-size:9px;color:#94A3B8;margin-top:1px;font-family:'Inter',system-ui,sans-serif">TCE-MA · Boletim informativo</p>
+        ${qrCodeDataUri ? `<p style="font-size:8px;color:#CBD5E1;margin-top:3px;font-family:'Inter',system-ui,sans-serif">Acesse pelo QR code</p>` : ""}
+      </div>
+      ${qrCodeDataUri ? `<img src="${qrCodeDataUri}" alt="QR code" style="width:52px;height:52px;flex-shrink:0">` : ""}
     </div>
   </div>
 
@@ -395,6 +416,8 @@ export function generateRelatorioMovimentacaoHTML(opts: PrintMovimentacaoOptions
 
   const arquivados    = processos.filter(p => p.tipo === "ARQUIVADO").length;
   const requeremAcao  = processos.filter(p => p.tipo !== "ARQUIVADO").length;
+  const urgentes      = processos.filter(p => p.urgencia === "urgencia").length;
+  const emAtencao     = processos.filter(p => p.urgencia === "atencao").length;
 
   // group by municipio
   const byMuni: Record<string, Processo[]> = {};
@@ -402,6 +425,12 @@ export function generateRelatorioMovimentacaoHTML(opts: PrintMovimentacaoOptions
     if (!byMuni[p.municipio]) byMuni[p.municipio] = [];
     byMuni[p.municipio].push(p);
   }
+  const municipiosOrdenados = Object.entries(byMuni).sort(([, a], [, b]) => {
+    const rank = (procs: Processo[]) => procs.some(p => p.urgencia === "urgencia") ? 0 : procs.some(p => p.urgencia === "atencao") ? 1 : 2;
+    return rank(a) - rank(b);
+  });
+
+  const slug = (s: string) => s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s+/g, "-");
 
   return `<!DOCTYPE html>
 <html lang="pt-BR">
@@ -422,6 +451,7 @@ export function generateRelatorioMovimentacaoHTML(opts: PrintMovimentacaoOptions
   .page { max-width: 720px; margin: 0 auto; }
   .print-btn { position: fixed; bottom: 24px; right: 24px; background: #111827; color: #fff; border: none; border-radius: 8px; padding: 10px 20px; font-size: 13px; font-weight: 500; cursor: pointer; font-family: 'Inter', system-ui, sans-serif; display: flex; align-items: center; gap: 8px; box-shadow: 0 4px 12px rgba(0,0,0,.15); }
   .print-btn:hover { background: #374151; }
+  a { text-decoration: none; }
 </style>
 </head>
 <body>
@@ -436,45 +466,67 @@ export function generateRelatorioMovimentacaoHTML(opts: PrintMovimentacaoOptions
   <div style="padding-bottom:16px;margin-bottom:20px;border-bottom:1px solid #E2E8F0;display:flex;align-items:center;justify-content:space-between;gap:16px">
     <div style="display:flex;align-items:center;gap:10px">
       ${assessoria.logo_url
-        ? `<img src="${assessoria.logo_url}" style="width:28px;height:28px;object-fit:contain;border-radius:5px" alt="Logo">`
-        : `<div style="width:28px;height:28px;border-radius:5px;background:#EEF2FF;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:#3730A3;border:0.5px solid #C7D2FE;font-family:'Inter',system-ui,sans-serif">${initials}</div>`
+        ? `<img src="${assessoria.logo_url}" style="width:32px;height:32px;object-fit:contain;border-radius:6px" alt="Logo">`
+        : `<div style="width:32px;height:32px;border-radius:6px;background:#EEF2FF;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#3730A3;border:0.5px solid #C7D2FE;font-family:'Inter',system-ui,sans-serif">${initials}</div>`
       }
-      <p style="font-size:13px;font-weight:600;color:#111827;font-family:'Inter',system-ui,sans-serif">${assessoria.nome}</p>
+      <div>
+        <p style="font-size:14px;font-weight:600;color:#111827;font-family:'Inter',system-ui,sans-serif">${assessoria.nome}</p>
+        <p style="font-size:10px;color:#94A3B8;text-transform:uppercase;letter-spacing:.06em;font-family:'Inter',system-ui,sans-serif;margin-top:1px">Movimentação processual</p>
+      </div>
     </div>
-    <div style="text-align:right;flex-shrink:0">
-      <p style="font-size:10px;color:#94A3B8;text-transform:uppercase;letter-spacing:.07em;font-family:'Inter',system-ui,sans-serif">Movimentação processual</p>
-      <p style="font-size:11px;color:#64748B;margin-top:3px;font-family:'Inter',system-ui,sans-serif">${dataCapitalizada}</p>
-    </div>
+    <p style="font-size:11px;color:#64748B;font-family:'Inter',system-ui,sans-serif;flex-shrink:0">${dataCapitalizada}</p>
   </div>
 
   <!-- RESUMO -->
-  <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:10px;margin:18px 0">
-    <div style="background:#F8FAFC;border-radius:6px;padding:10px 12px;text-align:center">
-      <p style="font-size:20px;font-weight:700;color:#111827;font-family:'Inter',system-ui,sans-serif">${processos.length}</p>
-      <p style="font-size:9px;color:#94A3B8;text-transform:uppercase;letter-spacing:.05em;font-family:'Inter',system-ui,sans-serif">Processos</p>
+  <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:20px">
+    <div style="background:#F8FAFC;border-radius:8px;padding:12px 8px;text-align:center;border:0.5px solid #F1F5F9">
+      <p style="font-size:22px;font-weight:700;color:#111827;font-family:'Inter',system-ui,sans-serif;line-height:1">${processos.length}</p>
+      <p style="font-size:8.5px;color:#94A3B8;text-transform:uppercase;letter-spacing:.04em;font-family:'Inter',system-ui,sans-serif;margin-top:3px">Processos</p>
     </div>
-    <div style="background:#F8FAFC;border-radius:6px;padding:10px 12px;text-align:center">
-      <p style="font-size:20px;font-weight:700;color:#111827;font-family:'Inter',system-ui,sans-serif">${arquivados}</p>
-      <p style="font-size:9px;color:#94A3B8;text-transform:uppercase;letter-spacing:.05em;font-family:'Inter',system-ui,sans-serif">Arquivados</p>
+    <div style="background:#F8FAFC;border-radius:8px;padding:12px 8px;text-align:center;border:0.5px solid #F1F5F9">
+      <p style="font-size:22px;font-weight:700;color:#64748B;font-family:'Inter',system-ui,sans-serif;line-height:1">${arquivados}</p>
+      <p style="font-size:8.5px;color:#94A3B8;text-transform:uppercase;letter-spacing:.04em;font-family:'Inter',system-ui,sans-serif;margin-top:3px">Arquivados</p>
     </div>
-    <div style="background:#FFFBEB;border-radius:6px;padding:10px 12px;text-align:center">
-      <p style="font-size:20px;font-weight:700;color:#92400E;font-family:'Inter',system-ui,sans-serif">${requeremAcao}</p>
-      <p style="font-size:9px;color:#92400E;text-transform:uppercase;letter-spacing:.05em;font-family:'Inter',system-ui,sans-serif">Requerem ação</p>
+    <div style="background:#EFF6FF;border-radius:8px;padding:12px 8px;text-align:center;border:0.5px solid #DBEAFE">
+      <p style="font-size:22px;font-weight:700;color:#1D4ED8;font-family:'Inter',system-ui,sans-serif;line-height:1">${requeremAcao}</p>
+      <p style="font-size:8.5px;color:#1D4ED8;text-transform:uppercase;letter-spacing:.04em;font-family:'Inter',system-ui,sans-serif;margin-top:3px">Requerem ação</p>
     </div>
-    <div style="background:#F8FAFC;border-radius:6px;padding:10px 12px;text-align:center">
-      <p style="font-size:20px;font-weight:700;color:#111827;font-family:'Inter',system-ui,sans-serif">${Object.keys(byMuni).length}</p>
-      <p style="font-size:9px;color:#94A3B8;text-transform:uppercase;letter-spacing:.05em;font-family:'Inter',system-ui,sans-serif">Municípios</p>
+    <div style="background:#FFFBEB;border-radius:8px;padding:12px 8px;text-align:center;border:0.5px solid #FDE68A">
+      <p style="font-size:22px;font-weight:700;color:#92400E;font-family:'Inter',system-ui,sans-serif;line-height:1">${emAtencao}</p>
+      <p style="font-size:8.5px;color:#92400E;text-transform:uppercase;letter-spacing:.04em;font-family:'Inter',system-ui,sans-serif;margin-top:3px">Atenção</p>
+    </div>
+    <div style="background:#FEF2F2;border-radius:8px;padding:12px 8px;text-align:center;border:0.5px solid #FCA5A5">
+      <p style="font-size:22px;font-weight:700;color:#991B1B;font-family:'Inter',system-ui,sans-serif;line-height:1">${urgentes}</p>
+      <p style="font-size:8.5px;color:#991B1B;text-transform:uppercase;letter-spacing:.04em;font-family:'Inter',system-ui,sans-serif;margin-top:3px">Urgência</p>
     </div>
   </div>
 
-  <!-- CORPO -->
-  <div style="padding-top:6px">
-    ${Object.entries(byMuni).map(([muni, procs]) => {
+  <!-- ÍNDICE -->
+  <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:22px">
+    ${municipiosOrdenados.map(([muni, procs]) => {
+      const hasUrgencia = procs.some(p => p.urgencia === "urgencia");
+      const hasAtencao  = procs.some(p => p.urgencia === "atencao");
+      const dotColor = hasUrgencia ? "#EF4444" : hasAtencao ? "#F59E0B" : "#CBD5E1";
       const muniLabel = muni.charAt(0) + muni.slice(1).toLowerCase();
+      return `<a href="#${slug(muni)}" style="display:inline-flex;align-items:center;gap:5px;background:#F8FAFC;border:0.5px solid #E2E8F0;border-radius:99px;padding:4px 10px;font-size:10px;color:#374151;font-family:'Inter',system-ui,sans-serif">
+        <span style="width:6px;height:6px;border-radius:50%;background:${dotColor};display:inline-block;flex-shrink:0"></span>
+        ${muniLabel} (${procs.length})
+      </a>`;
+    }).join("")}
+  </div>
+
+  <!-- CORPO -->
+  <div>
+    ${municipiosOrdenados.map(([muni, procs]) => {
+      const muniLabel = muni.charAt(0) + muni.slice(1).toLowerCase();
+      const hasUrgencia = procs.some(p => p.urgencia === "urgencia");
+      const hasAtencao  = procs.some(p => p.urgencia === "atencao");
+      const barColor = hasUrgencia ? "#991B1B" : hasAtencao ? "#92400E" : "#111827";
       return `
-      <div style="margin-bottom:20px">
-        <div style="background:#111827;color:#fff;padding:9px 14px;border-radius:6px;margin-bottom:10px">
+      <div id="${slug(muni)}" style="margin-bottom:22px">
+        <div style="background:${barColor};color:#fff;padding:9px 14px;border-radius:6px;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between">
           <p style="font-size:13px;font-weight:700;font-family:'Inter',system-ui,sans-serif;letter-spacing:-.01em">${muniLabel}</p>
+          <p style="font-size:10px;opacity:.75;font-family:'Inter',system-ui,sans-serif">${procs.length} processo${procs.length > 1 ? "s" : ""}</p>
         </div>
         ${procs.map(renderProcesso).join("")}
       </div>`;

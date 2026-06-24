@@ -5,7 +5,7 @@ export type TipoProvidencia =
   | "VISITAR_MP"
   | "OUTROS";
 
-export type UrgenciaProcesso = "normal" | "atencao" | "critica";
+export type UrgenciaProcesso = "normal" | "atencao" | "urgencia";
 
 export interface Processo {
   ordem: number;
@@ -58,6 +58,7 @@ export interface MencaoDiario {
   parecer_mp?: string;
   decisao?: string;
   descricao: string;
+  urgencia?: UrgenciaProcesso;
 }
 
 export interface MunicipioCruzado {

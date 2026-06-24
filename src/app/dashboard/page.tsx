@@ -1,9 +1,10 @@
 "use client";
 import { useState, useEffect } from "react";
 import { Plus, Trash2, CheckCircle, Loader2, FileText, ChevronDown, AlertTriangle } from "lucide-react";
-import { Processo, Municipio, Gestor } from "@/types";
+import { Processo, Municipio, Gestor, UrgenciaProcesso } from "@/types";
 import { StatCard } from "@/components/ui/StatCard";
 import { TipoBadge } from "@/components/ui/Badge";
+import { UrgenciaSelector } from "@/components/ui/UrgenciaSelector";
 import { formatWeekday, todayISO } from "@/lib/utils";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/lib/supabase";
@@ -29,6 +30,7 @@ const emptyForm = {
   municipio_id: "", municipio_nome: "",
   responsavel_id: "", responsavel: "",
   movimentacao: "", providencia: "",
+  urgencia: "normal" as UrgenciaProcesso,
 };
 
 export default function DashboardPage() {
@@ -74,7 +76,7 @@ export default function DashboardPage() {
       movimentacao: form.movimentacao,
       providencia: form.providencia,
       tipo:        PROVIDENCIA_TIPO[form.providencia] ?? "OUTROS",
-      urgencia:    form.providencia === "Arquivado — Arquivo Prescrição" ? "normal" : "atencao",
+      urgencia:    form.urgencia,
     };
     const updated = [...processos, novoProcesso];
     setProcessos(updated);
@@ -188,6 +190,10 @@ export default function DashboardPage() {
                 {PROVIDENCIAS.map(p => <option key={p}>{p}</option>)}
               </select>
             </div>
+            <div className="col-span-2">
+              <label className="text-xs text-ink-500 font-medium block mb-1">Prioridade</label>
+              <UrgenciaSelector value={form.urgencia} onChange={(v) => setForm(f => ({ ...f, urgencia: v }))} />
+            </div>
           </div>
           <button onClick={addProcesso} disabled={!form.proc || !form.municipio_nome || saving}
             className="w-full py-2.5 rounded-xl text-sm font-medium bg-brand-600 text-white hover:bg-brand-700 disabled:opacity-40 flex items-center justify-center gap-2">
@@ -264,7 +270,7 @@ export default function DashboardPage() {
               {processos.map((p, i) => (
                 <div key={i} className="flex items-start gap-3 px-5 py-3.5">
                   <div className={cn("w-1.5 h-1.5 rounded-full mt-2 flex-shrink-0",
-                    p.urgencia === "critica" ? "bg-red-500" : p.urgencia === "atencao" ? "bg-amber-400" : "bg-ink-300")} />
+                    p.urgencia === "urgencia" ? "bg-red-500" : p.urgencia === "atencao" ? "bg-amber-400" : "bg-ink-300")} />
                   <div className="flex-1 min-w-0">
                     <div className="flex flex-wrap items-center gap-2 mb-1">
                       <span className="text-xs font-mono text-ink-400">{p.proc}</span>

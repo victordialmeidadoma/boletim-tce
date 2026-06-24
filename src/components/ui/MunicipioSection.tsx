@@ -1,6 +1,6 @@
 import { MencaoDiario, MunicipioCruzado, TipoDiario } from "@/types";
 import { TipoBadge } from "./Badge";
-import { Building2, User, Calendar, Clock, Gavel, FileWarning, Bell, ClipboardList, FileSearch, FileText, X } from "lucide-react";
+import { Building2, User, Calendar, Clock, Gavel, FileWarning, Bell, ClipboardList, FileSearch, FileText, X, AlertTriangle, AlertCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const TIPO_CONFIG: Record<TipoDiario, { label: string; icon: React.ElementType; className: string }> = {
@@ -17,16 +17,38 @@ const TIPO_CONFIG: Record<TipoDiario, { label: string; icon: React.ElementType; 
   OUTROS:                      { label: "Outros",                     icon: FileText,      className: "bg-slate-50 text-slate-600 border-slate-200" },
 };
 
+function UrgenciaBadge({ urgencia }: { urgencia?: string }) {
+  if (urgencia === "urgencia") {
+    return (
+      <span className="inline-flex items-center gap-1 text-xs font-semibold px-2 py-0.5 rounded-full bg-red-50 text-red-700 border border-red-200">
+        <AlertTriangle className="w-3 h-3" />Urgência
+      </span>
+    );
+  }
+  if (urgencia === "atencao") {
+    return (
+      <span className="inline-flex items-center gap-1 text-xs font-semibold px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 border border-amber-200">
+        <AlertCircle className="w-3 h-3" />Atenção
+      </span>
+    );
+  }
+  return null;
+}
+
 function MencaoCard({ m, onRemove }: { m: MencaoDiario; onRemove?: () => void }) {
   const cfg = TIPO_CONFIG[m.tipo] ?? TIPO_CONFIG.OUTROS;
   const Icon = cfg.icon;
+  const borderClass = m.urgencia === "urgencia" ? "border-red-300" : m.urgencia === "atencao" ? "border-amber-300" : "border-slate-100";
 
   return (
-    <div className="border border-slate-100 rounded-lg overflow-hidden mb-3 last:mb-0">
+    <div className={cn("border rounded-lg overflow-hidden mb-3 last:mb-0", borderClass)}>
       <div className={cn("flex items-center gap-2 px-3 py-2 border-b border-current/10", cfg.className)}>
         <Icon className="w-3.5 h-3.5 flex-shrink-0" />
         <span className="text-xs font-semibold">{cfg.label}</span>
-        {m.proc && <span className="ml-auto text-xs font-mono opacity-70">{m.proc}</span>}
+        <div className="ml-auto flex items-center gap-2">
+          <UrgenciaBadge urgencia={m.urgencia} />
+          {m.proc && <span className="text-xs font-mono opacity-70">{m.proc}</span>}
+        </div>
         {onRemove && (
           <button onClick={onRemove} className="ml-2 opacity-60 hover:opacity-100 transition-opacity" title="Remover">
             <X className="w-3 h-3" />
@@ -94,6 +116,7 @@ export function MunicipioSection({ municipio, onRemoveMencao }: Props) {
                   <span className="text-xs font-mono text-ink-500">{p.proc}</span>
                   <span className="text-xs text-ink-400">{p.assunto}</span>
                   <TipoBadge tipo={p.tipo} />
+                  <UrgenciaBadge urgencia={p.urgencia} />
                 </div>
               ))}
             </div>

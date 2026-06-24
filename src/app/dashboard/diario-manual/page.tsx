@@ -4,9 +4,10 @@ import {
   Plus, Trash2, CheckCircle, Building2, FileText,
   Loader2, ChevronDown, AlertTriangle,
 } from "lucide-react";
-import { Municipio, TipoDiario } from "@/types";
+import { Municipio, TipoDiario, UrgenciaProcesso } from "@/types";
 import { formatWeekday, todayISO, cn } from "@/lib/utils";
 import { TIPO_LABELS, TIPO_COLOR, FIELDS_BY_TYPE, CATEGORIAS, categoriaDoTipo } from "@/lib/tipoDiario";
+import { UrgenciaSelector } from "@/components/ui/UrgenciaSelector";
 
 interface FormState {
   municipio: string; categoria: string; tipo: TipoDiario | ""; proc: string;
@@ -14,11 +15,13 @@ interface FormState {
   exercicio: string; responsaveis: string; relator: string;
   prazo: string; parecer_mp: string; decisao: string;
   descricao: string; resumo_consolidado: string;
+  urgencia: UrgenciaProcesso;
 }
 const emptyForm: FormState = {
   municipio:"", categoria:"", tipo:"", proc:"", entidade:"", natureza:"", especie:"",
   exercicio:"", responsaveis:"", relator:"", prazo:"", parecer_mp:"",
   decisao:"", descricao:"", resumo_consolidado:"",
+  urgencia: "normal",
 };
 
 interface Mencao extends FormState {
@@ -61,6 +64,7 @@ export default function DiarioManualPage() {
       decisao: form.decisao,
       descricao: form.descricao,
       resumo_consolidado: form.resumo_consolidado,
+      urgencia: form.urgencia,
     };
     const res = await fetch("/api/diario-manual", {
       method: "POST",
@@ -239,6 +243,11 @@ export default function DiarioManualPage() {
             <textarea className="field-textarea" rows={2} value={form.resumo_consolidado}
               onChange={e => setForm(f => ({ ...f, resumo_consolidado: e.target.value }))}
               placeholder="Observações sobre este município..." />
+          </div>
+
+          <div className="mb-3 mt-3">
+            <label className="text-xs text-ink-500 font-medium block mb-1">Prioridade</label>
+            <UrgenciaSelector value={form.urgencia} onChange={(v) => setForm(f => ({ ...f, urgencia: v }))} />
           </div>
 
           <button onClick={addMencao} disabled={!form.municipio || !form.tipo || saving}
