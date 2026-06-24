@@ -269,6 +269,7 @@ interface PrintCompletoOptions {
   municipios: MunicipioCruzado[];
   data: string;
   aviso?: string;
+  qrCodeDataUri?: string;
 }
 
 function renderMuniBlocoCompleto(municipio: MunicipioCruzado): string {
@@ -299,7 +300,7 @@ function renderMuniBlocoCompleto(municipio: MunicipioCruzado): string {
 }
 
 export function generateCompletoHTML(opts: PrintCompletoOptions): string {
-  const { assessoria, municipios, data, aviso } = opts;
+  const { assessoria, municipios, data, aviso, qrCodeDataUri } = opts;
   const dataFormatada = formatDate(data, "EEEE, dd 'de' MMMM 'de' yyyy");
   const dataCapitalizada = dataFormatada.charAt(0).toUpperCase() + dataFormatada.slice(1);
   const initials = assessoria.nome.split(" ").slice(0, 2).map((w: string) => w[0]).join("").toUpperCase();
@@ -379,16 +380,19 @@ export function generateCompletoHTML(opts: PrintCompletoOptions): string {
   </div>
 
   <!-- RODAPÉ -->
-  <div style="border-top:0.5px solid #E2E8F0;padding-top:10px;display:flex;justify-content:space-between;align-items:flex-start">
+  <div style="border-top:0.5px solid #E2E8F0;padding-top:10px;display:flex;justify-content:space-between;align-items:flex-end;gap:16px">
     <div style="text-align:left">
       <p style="font-size:10px;font-weight:600;color:#374151;font-family:'Inter',system-ui,sans-serif">${assessoria.nome}</p>
       ${assessoria.cnpj ? `<p style="font-size:9px;color:#94A3B8;margin-top:1px;font-family:'Inter',system-ui,sans-serif">CNPJ ${assessoria.cnpj}</p>` : ""}
       ${assessoria.endereco ? `<p style="font-size:9px;color:#94A3B8;font-family:'Inter',system-ui,sans-serif">${assessoria.endereco}</p>` : ""}
       ${assessoria.email ? `<p style="font-size:9px;color:#94A3B8;font-family:'Inter',system-ui,sans-serif">${assessoria.email}</p>` : ""}
     </div>
-    <div style="text-align:right">
-      <p style="font-size:9px;color:#94A3B8;font-family:'Inter',system-ui,sans-serif">Gerado em ${new Date().toLocaleDateString("pt-BR")}</p>
-      <p style="font-size:9px;color:#94A3B8;margin-top:1px;font-family:'Inter',system-ui,sans-serif">TCE-MA · Documento interno — uso da equipe</p>
+    <div style="display:flex;align-items:flex-end;gap:10px">
+      <div style="text-align:right">
+        <p style="font-size:9px;color:#94A3B8;font-family:'Inter',system-ui,sans-serif">Gerado em ${new Date().toLocaleDateString("pt-BR")}</p>
+        <p style="font-size:9px;color:#94A3B8;margin-top:1px;font-family:'Inter',system-ui,sans-serif">TCE-MA · Documento interno — uso da equipe</p>
+      </div>
+      ${qrCodeDataUri ? `<img src="${qrCodeDataUri}" alt="QR code" style="width:48px;height:48px;flex-shrink:0">` : ""}
     </div>
   </div>
 
@@ -403,16 +407,15 @@ export function generateCompletoHTML(opts: PrintCompletoOptions): string {
 // ───────────────────────────────────────────────────────────
 
 interface PrintMovimentacaoOptions {
-  assessoria: Assessoria;
   processos: Processo[];
   data: string;
+  qrCodeDataUri?: string;
 }
 
 export function generateRelatorioMovimentacaoHTML(opts: PrintMovimentacaoOptions): string {
-  const { assessoria, processos, data } = opts;
+  const { processos, data, qrCodeDataUri } = opts;
   const dataFormatada = formatDate(data, "EEEE, dd 'de' MMMM 'de' yyyy");
   const dataCapitalizada = dataFormatada.charAt(0).toUpperCase() + dataFormatada.slice(1);
-  const initials = assessoria.nome.split(" ").slice(0, 2).map((w: string) => w[0]).join("").toUpperCase();
 
   const arquivados    = processos.filter(p => p.tipo === "ARQUIVADO").length;
   const requeremAcao  = processos.filter(p => p.tipo !== "ARQUIVADO").length;
@@ -463,18 +466,14 @@ export function generateRelatorioMovimentacaoHTML(opts: PrintMovimentacaoOptions
 <div class="page">
 
   <!-- CABEÇALHO -->
-  <div style="padding-bottom:16px;margin-bottom:20px;border-bottom:1px solid #E2E8F0;display:flex;align-items:center;justify-content:space-between;gap:16px">
-    <div style="display:flex;align-items:center;gap:10px">
-      ${assessoria.logo_url
-        ? `<img src="${assessoria.logo_url}" style="width:32px;height:32px;object-fit:contain;border-radius:6px" alt="Logo">`
-        : `<div style="width:32px;height:32px;border-radius:6px;background:#EEF2FF;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#3730A3;border:0.5px solid #C7D2FE;font-family:'Inter',system-ui,sans-serif">${initials}</div>`
-      }
+  <div style="padding-bottom:18px;margin-bottom:22px;border-bottom:2px solid #111827">
+    <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:16px">
       <div>
-        <p style="font-size:14px;font-weight:600;color:#111827;font-family:'Inter',system-ui,sans-serif">${assessoria.nome}</p>
-        <p style="font-size:10px;color:#94A3B8;text-transform:uppercase;letter-spacing:.06em;font-family:'Inter',system-ui,sans-serif;margin-top:1px">Movimentação processual</p>
+        <p style="font-size:26px;font-weight:700;color:#111827;font-family:'Inter',system-ui,sans-serif;letter-spacing:-.02em;line-height:1.1">Movimentação Processual</p>
+        <p style="font-size:11px;color:#64748B;font-family:'Inter',system-ui,sans-serif;margin-top:4px">${dataCapitalizada}</p>
       </div>
+      <p style="font-size:10px;color:#94A3B8;text-transform:uppercase;letter-spacing:.08em;font-family:'Inter',system-ui,sans-serif;flex-shrink:0">TCE-MA</p>
     </div>
-    <p style="font-size:11px;color:#64748B;font-family:'Inter',system-ui,sans-serif;flex-shrink:0">${dataCapitalizada}</p>
   </div>
 
   <!-- RESUMO -->
@@ -534,16 +533,9 @@ export function generateRelatorioMovimentacaoHTML(opts: PrintMovimentacaoOptions
   </div>
 
   <!-- RODAPÉ -->
-  <div style="border-top:0.5px solid #E2E8F0;padding-top:10px;display:flex;justify-content:space-between;align-items:flex-start">
-    <div style="text-align:left">
-      <p style="font-size:10px;font-weight:600;color:#374151;font-family:'Inter',system-ui,sans-serif">${assessoria.nome}</p>
-      ${assessoria.cnpj ? `<p style="font-size:9px;color:#94A3B8;margin-top:1px;font-family:'Inter',system-ui,sans-serif">CNPJ ${assessoria.cnpj}</p>` : ""}
-      ${assessoria.endereco ? `<p style="font-size:9px;color:#94A3B8;font-family:'Inter',system-ui,sans-serif">${assessoria.endereco}</p>` : ""}
-    </div>
-    <div style="text-align:right">
-      <p style="font-size:9px;color:#94A3B8;font-family:'Inter',system-ui,sans-serif">Gerado em ${new Date().toLocaleDateString("pt-BR")}</p>
-      <p style="font-size:9px;color:#94A3B8;margin-top:1px;font-family:'Inter',system-ui,sans-serif">TCE-MA · Movimentação processual</p>
-    </div>
+  <div style="border-top:0.5px solid #E2E8F0;padding-top:12px;display:flex;justify-content:space-between;align-items:center">
+    <p style="font-size:9px;color:#94A3B8;font-family:'Inter',system-ui,sans-serif">Gerado em ${new Date().toLocaleDateString("pt-BR")} · TCE-MA</p>
+    ${qrCodeDataUri ? `<img src="${qrCodeDataUri}" alt="QR code" style="width:46px;height:46px;flex-shrink:0">` : ""}
   </div>
 
 </div>
@@ -563,10 +555,11 @@ interface PrintDiarioOptions {
   assessoria: Assessoria;
   mencoes: MencaoComMunicipio[];
   data: string;
+  qrCodeDataUri?: string;
 }
 
 export function generateRelatorioDiarioHTML(opts: PrintDiarioOptions): string {
-  const { assessoria, mencoes, data } = opts;
+  const { assessoria, mencoes, data, qrCodeDataUri } = opts;
   const dataFormatada = formatDate(data, "EEEE, dd 'de' MMMM 'de' yyyy");
   const dataCapitalizada = dataFormatada.charAt(0).toUpperCase() + dataFormatada.slice(1);
   const initials = assessoria.nome.split(" ").slice(0, 2).map((w: string) => w[0]).join("").toUpperCase();
@@ -648,15 +641,18 @@ export function generateRelatorioDiarioHTML(opts: PrintDiarioOptions): string {
   </div>
 
   <!-- RODAPÉ -->
-  <div style="border-top:0.5px solid #E2E8F0;padding-top:10px;display:flex;justify-content:space-between;align-items:flex-start">
+  <div style="border-top:0.5px solid #E2E8F0;padding-top:10px;display:flex;justify-content:space-between;align-items:flex-end">
     <div style="text-align:left">
       <p style="font-size:10px;font-weight:600;color:#374151;font-family:'Inter',system-ui,sans-serif">${assessoria.nome}</p>
       ${assessoria.cnpj ? `<p style="font-size:9px;color:#94A3B8;margin-top:1px;font-family:'Inter',system-ui,sans-serif">CNPJ ${assessoria.cnpj}</p>` : ""}
       ${assessoria.endereco ? `<p style="font-size:9px;color:#94A3B8;font-family:'Inter',system-ui,sans-serif">${assessoria.endereco}</p>` : ""}
     </div>
-    <div style="text-align:right">
-      <p style="font-size:9px;color:#94A3B8;font-family:'Inter',system-ui,sans-serif">Gerado em ${new Date().toLocaleDateString("pt-BR")}</p>
-      <p style="font-size:9px;color:#94A3B8;margin-top:1px;font-family:'Inter',system-ui,sans-serif">TCE-MA · Diário</p>
+    <div style="display:flex;align-items:flex-end;gap:10px">
+      <div style="text-align:right">
+        <p style="font-size:9px;color:#94A3B8;font-family:'Inter',system-ui,sans-serif">Gerado em ${new Date().toLocaleDateString("pt-BR")}</p>
+        <p style="font-size:9px;color:#94A3B8;margin-top:1px;font-family:'Inter',system-ui,sans-serif">TCE-MA · Diário</p>
+      </div>
+      ${qrCodeDataUri ? `<img src="${qrCodeDataUri}" alt="QR code" style="width:46px;height:46px;flex-shrink:0">` : ""}
     </div>
   </div>
 

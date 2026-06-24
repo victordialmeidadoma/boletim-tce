@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createServerClient } from "@/lib/supabase";
 import { generateCompletoHTML } from "@/lib/printTemplate";
 import { montarMunicipiosCruzados } from "@/lib/montarBoletim";
+import { gerarQRCodeDataUri, urlPublicaDia } from "@/lib/qrcode";
 
 export async function POST(req: NextRequest) {
   try {
@@ -27,11 +28,19 @@ export async function POST(req: NextRequest) {
       if (ass) assessoria = ass;
     }
 
+    let qrCodeDataUri: string | undefined;
+    try {
+      qrCodeDataUri = await gerarQRCodeDataUri(urlPublicaDia(data));
+    } catch {
+      qrCodeDataUri = undefined;
+    }
+
     const html = generateCompletoHTML({
       assessoria,
       municipios,
       data,
       aviso: aviso || undefined,
+      qrCodeDataUri,
     });
 
     return new NextResponse(html, {

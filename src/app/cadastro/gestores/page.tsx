@@ -4,7 +4,7 @@ import { Plus, Trash2, CheckCircle, Loader2 } from "lucide-react";
 import { Gestor, Municipio } from "@/types";
 import { cn } from "@/lib/utils";
 
-const CARGOS = ["Prefeito","Vice-prefeito","Secretário(a) de Saúde","Secretário(a) de Educação","Secretário(a) de Finanças","Secretário(a) de Obras","Controlador(a) Interno","Presidente da Câmara","Outro"];
+const CARGOS = ["Prefeito","Ex-prefeito","Vice-prefeito","Secretário(a) de Saúde","Secretário(a) de Educação","Secretário(a) de Finanças","Secretário(a) de Obras","Controlador(a) Interno","Presidente da Câmara","Outro"];
 
 export default function GestoresPage() {
   const [gestores,   setGestores]   = useState<(Gestor & { municipios?: { nome: string } })[]>([]);

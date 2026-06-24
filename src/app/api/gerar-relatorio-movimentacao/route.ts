@@ -2,10 +2,11 @@ import { NextRequest, NextResponse } from "next/server";
 import { createServerClient } from "@/lib/supabase";
 import { generateRelatorioMovimentacaoHTML } from "@/lib/printTemplate";
 import { Processo } from "@/types";
+import { gerarQRCodeDataUri, urlPublicaDia } from "@/lib/qrcode";
 
 export async function POST(req: NextRequest) {
   try {
-    const { data, assessoria_id } = await req.json();
+    const { data } = await req.json();
     if (!data) return NextResponse.json({ error: "data obrigatória" }, { status: 400 });
 
     const db = createServerClient();
@@ -22,16 +23,14 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Nenhuma movimentação encontrada para esta data." }, { status: 404 });
     }
 
-    let assessoria = { nome: "TCE-MA" };
-    if (assessoria_id) {
-      const { data: ass } = await db.from("assessorias").select("*").eq("id", assessoria_id).single();
-      if (ass) assessoria = ass;
-    } else {
-      const { data: ass } = await db.from("assessorias").select("*").limit(1).single();
-      if (ass) assessoria = ass;
+    let qrCodeDataUri: string | undefined;
+    try {
+      qrCodeDataUri = await gerarQRCodeDataUri(urlPublicaDia(data));
+    } catch {
+      qrCodeDataUri = undefined;
     }
 
-    const html = generateRelatorioMovimentacaoHTML({ assessoria, processos, data });
+    const html = generateRelatorioMovimentacaoHTML({ processos, data, qrCodeDataUri });
 
     return new NextResponse(html, {
       headers: {

@@ -6,17 +6,16 @@ export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const data = searchParams.get("data");
 
-  if (!data) return NextResponse.json({ error: "data param required" }, { status: 400 });
+  if (!data) {
+    return NextResponse.json({ error: "data obrigatória" }, { status: 400 });
+  }
 
   const db = createServerClient();
-
-  const { data: relatorio } = await db
-    .from("relatorios")
-    .select("*")
-    .eq("data", data)
-    .single();
-
   const municipios = await montarMunicipiosCruzados(db, data);
 
-  return NextResponse.json({ relatorio, municipios });
+  if (municipios.length === 0) {
+    return NextResponse.json({ error: "Nenhuma informação encontrada." }, { status: 404 });
+  }
+
+  return NextResponse.json({ data, municipios });
 }

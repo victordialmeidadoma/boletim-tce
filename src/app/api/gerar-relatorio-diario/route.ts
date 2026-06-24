@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServerClient } from "@/lib/supabase";
 import { generateRelatorioDiarioHTML } from "@/lib/printTemplate";
+import { gerarQRCodeDataUri, urlPublicaDia } from "@/lib/qrcode";
 
 export async function POST(req: NextRequest) {
   try {
@@ -44,7 +45,9 @@ export async function POST(req: NextRequest) {
       if (ass) assessoria = ass;
     }
 
-    const html = generateRelatorioDiarioHTML({ assessoria, mencoes, data });
+    const html = generateRelatorioDiarioHTML({ assessoria, mencoes, data, qrCodeDataUri: await (async () => {
+      try { return await gerarQRCodeDataUri(urlPublicaDia(data)); } catch { return undefined; }
+    })() });
 
     return new NextResponse(html, {
       headers: {

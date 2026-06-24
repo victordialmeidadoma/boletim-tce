@@ -2,7 +2,6 @@
 import { useState, useEffect } from "react";
 import { Plus, Trash2, CheckCircle, Loader2, FileText, ChevronDown, AlertTriangle } from "lucide-react";
 import { Processo, Municipio, Gestor, UrgenciaProcesso } from "@/types";
-import { StatCard } from "@/components/ui/StatCard";
 import { TipoBadge } from "@/components/ui/Badge";
 import { UrgenciaSelector } from "@/components/ui/UrgenciaSelector";
 import { formatWeekday, todayISO } from "@/lib/utils";
@@ -120,9 +119,7 @@ export default function DashboardPage() {
     setConfirmApagarTudo(false);
   }
 
-  const arquivados   = processos.filter(p => p.tipo === "ARQUIVADO").length;
-  const requeremAcao = processos.filter(p => p.tipo !== "ARQUIVADO").length;
-  const visitarMP    = processos.filter(p => p.tipo === "VISITAR_MP").length;
+  // (estatísticas de arquivados/ação/MP removidas da tela — ficam só no PDF gerado)
 
   return (
     <div className="max-w-3xl mx-auto px-6 py-8">
@@ -210,21 +207,14 @@ export default function DashboardPage() {
         {showForm ? "Ocultar formulário" : "Mostrar formulário"}
       </button>
 
-      {/* Stats */}
+      {/* Lista de processos */}
       {processos.length > 0 && (
         <>
-          <div className="grid grid-cols-4 gap-3 mb-5">
-            <StatCard value={processos.length} label="Processos" />
-            <StatCard value={arquivados} label="Arquivados" />
-            <StatCard value={requeremAcao} label="Requerem ação" warn={requeremAcao > 0} />
-            <StatCard value={visitarMP} label="Visitar MP" />
-          </div>
-
           <div className="bg-white rounded-2xl shadow-card overflow-hidden">
             <div className="px-5 py-4 border-b border-ink-100 flex items-center justify-between">
               <div>
                 <h2 className="text-sm font-semibold text-ink-800">Processos do dia</h2>
-                <p className="text-xs text-ink-400 mt-0.5">{formatWeekday(today)}</p>
+                <p className="text-xs text-ink-400 mt-0.5">{formatWeekday(today)} · {processos.length} processo{processos.length > 1 ? "s" : ""}</p>
               </div>
               <div className="flex items-center gap-2">
                 <button

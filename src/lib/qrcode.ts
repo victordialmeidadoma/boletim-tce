@@ -20,3 +20,12 @@ export function urlPublicaBoletim(municipio: string, data: string): string {
   const base = process.env.NEXT_PUBLIC_SITE_URL || "https://main.dlzpm1tj9wo2v.amplifyapp.com/";
   return `${base}/publico/${encodeURIComponent(municipio)}/${data}`;
 }
+
+/**
+ * Monta a URL pública geral do dia (todos os municípios) — usada nos
+ * relatórios que não são específicos de um município.
+ */
+export function urlPublicaDia(data: string): string {
+  const base = process.env.NEXT_PUBLIC_SITE_URL || "https://main.dlzpm1tj9wo2v.amplifyapp.com/";
+  return `${base}/publico-dia/${data}`;
+}
