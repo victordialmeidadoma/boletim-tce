@@ -68,12 +68,12 @@ function MencaoCard({ m, onRemove }: { m: MencaoDiario; onRemove?: () => void })
         {m.decisao && (
           <div className="mt-2 pt-2 border-t border-slate-100">
             <p className="text-xs text-slate-500 mb-0.5">Dispositivo</p>
-            <p className="text-xs text-slate-800 leading-relaxed">{m.decisao}</p>
+            <p className="text-xs text-slate-800 leading-relaxed whitespace-pre-line">{m.decisao}</p>
           </div>
         )}
         {m.descricao && !m.decisao && (
           <div className="mt-1.5 pt-1.5 border-t border-slate-100">
-            <p className="text-xs text-slate-600 leading-relaxed">{m.descricao}</p>
+            <p className="text-xs text-slate-600 leading-relaxed whitespace-pre-line">{m.descricao}</p>
           </div>
         )}
       </div>
@@ -132,7 +132,7 @@ export function MunicipioSection({ municipio, onRemoveMencao }: Props) {
         )}
         {municipio.resumo_consolidado && (
           <div className="px-4 py-3 bg-brand-50/50">
-            <p className="text-xs text-brand-700 leading-relaxed">{municipio.resumo_consolidado}</p>
+            <p className="text-xs text-brand-700 leading-relaxed whitespace-pre-line">{municipio.resumo_consolidado}</p>
           </div>
         )}
       </div>

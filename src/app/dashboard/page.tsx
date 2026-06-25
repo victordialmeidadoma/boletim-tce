@@ -268,7 +268,7 @@ export default function DashboardPage() {
                       <TipoBadge tipo={p.tipo} />
                     </div>
                     <p className="text-sm font-medium text-ink-800">{p.municipio} — {p.assunto}</p>
-                    <p className="text-xs text-ink-500 mt-0.5 line-clamp-2">{p.movimentacao}</p>
+                    <p className="text-xs text-ink-500 mt-0.5 line-clamp-2 whitespace-pre-line">{p.movimentacao}</p>
                     <p className="text-xs text-ink-400 mt-1">Resp.: {p.responsavel}</p>
                   </div>
                   <button onClick={() => removeProcesso(i)}
