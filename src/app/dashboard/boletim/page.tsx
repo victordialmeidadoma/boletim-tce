@@ -106,15 +106,9 @@ export default function BoletimPage() {
     setConfirmApagar(false);
   }
 
-  async function gerarPdfMunicipio(muni: string) {
-    const res = await fetch("/api/gerar-pdf", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ data: today, municipio_nome: muni, aviso: bulkAviso }),
-    });
-    const html = await res.text();
-    const blob = new Blob([html], { type: "text/html" });
-    window.open(URL.createObjectURL(blob), "_blank");
+  function gerarPdfMunicipio(muni: string) {
+    const params = new URLSearchParams({ data: today, municipio_nome: muni, ...(bulkAviso ? { aviso: bulkAviso } : {}) });
+    window.open(`/api/gerar-pdf?${params.toString()}`, "_blank");
   }
 
   async function gerarTodos() {
@@ -157,14 +151,8 @@ export default function BoletimPage() {
 
   async function gerarCompleto() {
     setCompletoStatus("loading");
-    const res = await fetch("/api/gerar-completo", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ data: today, aviso: bulkAviso }),
-    });
-    const html = await res.text();
-    const blob = new Blob([html], { type: "text/html" });
-    window.open(URL.createObjectURL(blob), "_blank");
+    const params = new URLSearchParams({ data: today, ...(bulkAviso ? { aviso: bulkAviso } : {}) });
+    window.open(`/api/gerar-completo?${params.toString()}`, "_blank");
     setCompletoStatus("idle");
   }
 

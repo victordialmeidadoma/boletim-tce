@@ -218,15 +218,8 @@ export default function DashboardPage() {
               </div>
               <div className="flex items-center gap-2">
                 <button
-                  onClick={async () => {
-                    const res = await fetch("/api/gerar-relatorio-movimentacao", {
-                      method: "POST",
-                      headers: { "Content-Type": "application/json" },
-                      body: JSON.stringify({ data: today }),
-                    });
-                    const html = await res.text();
-                    const blob = new Blob([html], { type: "text/html" });
-                    window.open(URL.createObjectURL(blob), "_blank");
+                  onClick={() => {
+                    window.open(`/api/gerar-relatorio-movimentacao?data=${today}`, "_blank");
                   }}
                   className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-ink-900 text-white text-xs font-medium hover:bg-ink-800"
                 >

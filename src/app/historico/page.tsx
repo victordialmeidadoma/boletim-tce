@@ -32,38 +32,12 @@ export default function HistoricoPage() {
       .catch(() => setLoading(false));
   }, []);
 
-  async function downloadMovimentacao(data: string) {
-    setDownloading(data + "-mov");
-    try {
-      const res = await fetch("/api/gerar-relatorio-movimentacao", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ data }),
-      });
-      if (!res.ok) { alert("Nenhuma movimentação para gerar."); return; }
-      const html = await res.text();
-      const blob = new Blob([html], { type: "text/html" });
-      window.open(URL.createObjectURL(blob), "_blank");
-    } finally {
-      setDownloading(null);
-    }
+  function downloadMovimentacao(data: string) {
+    window.open(`/api/gerar-relatorio-movimentacao?data=${data}`, "_blank");
   }
 
-  async function downloadCompleto(data: string) {
-    setDownloading(data + "-completo");
-    try {
-      const res = await fetch("/api/gerar-completo", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ data }),
-      });
-      if (!res.ok) { alert("Nenhum boletim para gerar."); return; }
-      const html = await res.text();
-      const blob = new Blob([html], { type: "text/html" });
-      window.open(URL.createObjectURL(blob), "_blank");
-    } finally {
-      setDownloading(null);
-    }
+  function downloadCompleto(data: string) {
+    window.open(`/api/gerar-completo?data=${data}`, "_blank");
   }
 
   return (

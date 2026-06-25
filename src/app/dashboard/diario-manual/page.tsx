@@ -92,16 +92,9 @@ export default function DiarioManualPage() {
     setConfirmApagarTudo(false);
   }
 
-  async function gerarRelatorioDiario() {
+  function gerarRelatorioDiario() {
     setGenStatus("loading");
-    const res = await fetch("/api/gerar-relatorio-diario", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ data: today }),
-    });
-    const html = await res.text();
-    const blob = new Blob([html], { type: "text/html" });
-    window.open(URL.createObjectURL(blob), "_blank");
+    window.open(`/api/gerar-relatorio-diario?data=${today}`, "_blank");
     setGenStatus("done");
     setTimeout(() => setGenStatus("idle"), 2000);
   }
