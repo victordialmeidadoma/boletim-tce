@@ -92,11 +92,11 @@ function renderMencao(m: MencaoDiario): string {
       ${m.decisao ? `
         <div style="margin-top:8px;padding-top:8px;border-top:0.5px solid #F1F5F9">
           <p style="font-size:9px;color:#94A3B8;text-transform:uppercase;letter-spacing:.05em;margin-bottom:3px;font-family:'Inter',system-ui,sans-serif">Dispositivo</p>
-          <p style="font-size:11px;color:#111827;line-height:1.6;font-family:'Inter',system-ui,sans-serif">${m.decisao}</p>
+          <p style="font-size:11px;color:#111827;line-height:1.6;font-family:'Inter',system-ui,sans-serif;white-space:pre-line">${m.decisao}</p>
         </div>` : ""}
       ${m.descricao && !m.decisao ? `
         <div style="margin-top:8px;padding-top:8px;border-top:0.5px solid #F1F5F9">
-          <p style="font-size:11px;color:#374151;line-height:1.6;font-family:'Inter',system-ui,sans-serif">${m.descricao}</p>
+          <p style="font-size:11px;color:#374151;line-height:1.6;font-family:'Inter',system-ui,sans-serif;white-space:pre-line">${m.descricao}</p>
         </div>` : ""}
     </div>
   </div>`;
@@ -127,7 +127,7 @@ function renderProcesso(p: Processo): string {
     </div>
     <div style="padding:10px 12px;background:${u.bg}">
       <div style="font-size:9px;color:#94A3B8;text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px;font-family:'Inter',system-ui,sans-serif">Movimentação</div>
-      <div style="font-size:12px;color:#374151;line-height:1.6;font-family:'Inter',system-ui,sans-serif">${p.movimentacao}</div>
+      <div style="font-size:12px;color:#374151;line-height:1.6;font-family:'Inter',system-ui,sans-serif;white-space:pre-line">${p.movimentacao}</div>
       <div style="font-size:10px;color:#94A3B8;margin-top:6px;font-family:'Inter',system-ui,sans-serif">Resp.: ${p.responsavel}</div>
     </div>
   </div>`;
@@ -434,7 +434,7 @@ function renderProcessoEditorial(p: Processo): string {
       ${tagLabel ? `<span style="font-size:9.5px;font-weight:600;color:${tagColor};text-transform:uppercase;letter-spacing:.04em;font-family:'Inter',system-ui,sans-serif;flex-shrink:0">${tagLabel}</span>` : ""}
     </div>
     <p style="font-size:13px;font-weight:600;color:#111827;font-family:'Inter',system-ui,sans-serif;margin:0 0 3px;letter-spacing:-.01em">${p.assunto}</p>
-    <p style="font-size:11.5px;color:#475569;line-height:1.45;font-family:'Inter',system-ui,sans-serif;margin:0 0 4px">${p.movimentacao}</p>
+    <p style="font-size:11.5px;color:#475569;line-height:1.45;font-family:'Inter',system-ui,sans-serif;margin:0 0 4px;white-space:pre-line">${p.movimentacao}</p>
     <p style="font-size:10.5px;color:#94A3B8;font-family:'Inter',system-ui,sans-serif;margin:0">Resp.: ${p.responsavel}</p>
   </div>`;
 }
