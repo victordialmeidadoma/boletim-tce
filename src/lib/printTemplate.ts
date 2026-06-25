@@ -188,13 +188,13 @@ export function generateBoletimHTML(opts: PrintOptions): string {
 
       <!-- Direita: brasão + logo assessoria, data -->
       <div style="text-align:right;flex-shrink:0">
-        <div style="display:flex;align-items:center;justify-content:flex-end;gap:10px;margin-bottom:10px">
+        <div style="display:flex;align-items:center;justify-content:flex-end;gap:12px;margin-bottom:10px">
           ${brasaoUrl
             ? `<img src="${brasaoUrl}" style="width:34px;height:34px;object-fit:contain;border-radius:50%" alt="Brasão">`
             : ""
           }
           ${assessoria.logo_url
-            ? `<img src="${assessoria.logo_url}" style="width:34px;height:34px;object-fit:contain;border-radius:6px" alt="Logo">`
+            ? `<img src="${assessoria.logo_url}" style="width:56px;height:56px;object-fit:contain;border-radius:8px" alt="Logo">`
             : ""
           }
         </div>
@@ -428,14 +428,14 @@ function renderProcessoEditorial(p: Processo): string {
   const tagLabel   = isUrgencia ? "Urgência" : isAtencao ? "Atenção" : (TIPO_PROVIDENCIA_LABEL[p.tipo] ?? "");
 
   return `
-  <div style="border-left:3px solid ${barColor};padding-left:16px;margin-bottom:24px">
-    <div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:4px">
-      <p style="font-family:monospace;font-size:13px;color:#64748B;font-family:'Inter',system-ui,sans-serif;margin:0">${p.proc} <span style="color:#94A3B8">· ${p.exerc}</span></p>
-      ${tagLabel ? `<span style="font-size:11px;font-weight:600;color:${tagColor};text-transform:uppercase;letter-spacing:.04em;font-family:'Inter',system-ui,sans-serif;flex-shrink:0">${tagLabel}</span>` : ""}
+  <div style="border-left:3px solid ${barColor};padding-left:14px;margin-bottom:14px">
+    <div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:3px">
+      <p style="font-size:11px;color:#64748B;font-family:'Inter',system-ui,sans-serif;margin:0">${p.proc} <span style="color:#94A3B8">· ${p.exerc}</span></p>
+      ${tagLabel ? `<span style="font-size:9.5px;font-weight:600;color:${tagColor};text-transform:uppercase;letter-spacing:.04em;font-family:'Inter',system-ui,sans-serif;flex-shrink:0">${tagLabel}</span>` : ""}
     </div>
-    <p style="font-size:16px;font-weight:600;color:#111827;font-family:'Inter',system-ui,sans-serif;margin:0 0 6px;letter-spacing:-.01em">${p.assunto}</p>
-    <p style="font-size:14px;color:#475569;line-height:1.6;font-family:'Inter',system-ui,sans-serif;margin:0 0 8px">${p.movimentacao}</p>
-    <p style="font-size:12px;color:#94A3B8;font-family:'Inter',system-ui,sans-serif;margin:0">Resp.: ${p.responsavel}</p>
+    <p style="font-size:13px;font-weight:600;color:#111827;font-family:'Inter',system-ui,sans-serif;margin:0 0 3px;letter-spacing:-.01em">${p.assunto}</p>
+    <p style="font-size:11.5px;color:#475569;line-height:1.45;font-family:'Inter',system-ui,sans-serif;margin:0 0 4px">${p.movimentacao}</p>
+    <p style="font-size:10.5px;color:#94A3B8;font-family:'Inter',system-ui,sans-serif;margin:0">Resp.: ${p.responsavel}</p>
   </div>`;
 }
 
@@ -539,12 +539,12 @@ export function generateRelatorioMovimentacaoHTML(opts: PrintMovimentacaoOptions
     ${municipiosOrdenados.map(([muni, procs]) => {
       const muniLabel = muni.charAt(0) + muni.slice(1).toLowerCase();
       return `
-      <div id="${slug(muni)}" style="margin-bottom:36px">
+      <div id="${slug(muni)}" style="margin-bottom:22px">
         <div style="display:flex;align-items:baseline;gap:10px;margin-bottom:4px">
-          <h2 style="font-size:20px;font-weight:600;color:#111827;font-family:'Inter',system-ui,sans-serif;letter-spacing:-.01em;margin:0">${muniLabel}</h2>
-          <span style="font-size:13px;color:#94A3B8;font-family:'Inter',system-ui,sans-serif">${procs.length} processo${procs.length > 1 ? "s" : ""}</span>
+          <h2 style="font-size:19px;font-weight:600;color:#111827;font-family:'Inter',system-ui,sans-serif;letter-spacing:-.01em;margin:0">${muniLabel}</h2>
+          <span style="font-size:12px;color:#94A3B8;font-family:'Inter',system-ui,sans-serif">${procs.length} processo${procs.length > 1 ? "s" : ""}</span>
         </div>
-        <div style="height:1px;background:#E2E8F0;margin:12px 0 20px"></div>
+        <div style="height:1px;background:#E2E8F0;margin:8px 0 12px"></div>
         ${procs.map(renderProcessoEditorial).join("")}
       </div>`;
     }).join("")}
